@@ -21,9 +21,14 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 .page-header h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,2.6rem);}
 .page-header h1 em{color:var(--rose);font-style:italic;}
 .page-header p{color:var(--muted);font-style:italic;margin-top:6px;border-left:2px solid var(--gold);padding-left:12px;}
-.books-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:24px;}
+
+.books-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:28px;}
+
 .book-card{cursor:pointer;transition:transform 0.3s;opacity:0;animation:fadeUp 0.5s ease forwards;}
 .book-card:hover{transform:translateY(-8px);}
+
+/* COVER */
+.book-cover-wrap{position:relative;}
 .book-cover{width:100%;aspect-ratio:2/3;border-radius:3px 10px 10px 3px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 10px;text-align:center;position:relative;overflow:hidden;box-shadow:-4px 0 0 rgba(0,0,0,0.3),6px 12px 24px rgba(0,0,0,0.5);transition:box-shadow 0.3s;}
 .book-card:hover .book-cover{box-shadow:-4px 0 0 rgba(0,0,0,0.3),10px 20px 36px rgba(0,0,0,0.6);}
 .book-cover::before{content:'';position:absolute;left:0;top:0;bottom:0;width:16px;background:rgba(0,0,0,0.2);border-right:1px solid rgba(255,255,255,0.06);}
@@ -31,10 +36,20 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 .book-cover-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;}
 .book-cover-title{font-family:'Playfair Display',serif;font-size:0.78rem;font-weight:700;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.6);z-index:1;line-height:1.3;}
 .book-cover-author{font-size:0.62rem;font-style:italic;color:rgba(255,255,255,0.7);margin-top:8px;z-index:1;}
+
+/* PROGRESS BAR ON COVER */
+.book-progress-wrap{position:absolute;bottom:0;left:0;right:0;z-index:5;}
+.book-progress-bar{height:4px;background:linear-gradient(to right,var(--deep-rose),var(--gold));transition:width 0.4s ease;}
+.book-progress-label{position:absolute;bottom:6px;right:8px;background:rgba(0,0,0,0.65);color:#fff;font-size:0.6rem;padding:2px 6px;border-radius:8px;z-index:6;backdrop-filter:blur(4px);}
+
+/* STARTED BADGE */
+.badge-started{position:absolute;top:8px;left:20px;background:rgba(212,120,154,0.85);color:#fff;font-size:0.58rem;padding:2px 8px;border-radius:8px;z-index:6;backdrop-filter:blur(4px);letter-spacing:0.05em;}
+.badge-done{background:rgba(201,168,76,0.85);}
+
 .book-meta{margin-top:10px;}
 .book-meta h3{font-family:'Playfair Display',serif;font-size:0.82rem;color:var(--cream);line-height:1.3;}
 .book-meta p{font-size:0.72rem;color:var(--muted);font-style:italic;margin-top:2px;}
-.book-card:nth-child(1){animation-delay:0.1s;}.book-card:nth-child(2){animation-delay:0.2s;}.book-card:nth-child(3){animation-delay:0.3s;}.book-card:nth-child(4){animation-delay:0.4s;}.book-card:nth-child(5){animation-delay:0.5s;}.book-card:nth-child(6){animation-delay:0.6s;}
+
 /* MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(5,2,8,0.88);backdrop-filter:blur(10px);z-index:200;align-items:center;justify-content:center;padding:20px;}
 .modal-overlay.active{display:flex;}
@@ -50,12 +65,21 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 .modal-info .author{color:var(--rose);font-style:italic;font-size:0.95rem;margin-top:5px;}
 .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
 .tag{background:rgba(201,168,76,0.1);color:var(--gold);font-size:0.67rem;padding:3px 10px;border-radius:20px;}
-.synopsis{color:rgba(245,237,224,0.75);line-height:1.85;font-size:0.97rem;border-top:1px solid var(--border);padding-top:18px;margin-top:4px;}
+
+/* PROGRESS IN MODAL */
+.modal-progress{margin-top:14px;}
+.modal-progress-label{display:flex;justify-content:space-between;font-size:0.75rem;color:var(--muted);margin-bottom:6px;}
+.modal-progress-label span:last-child{color:var(--gold);font-style:italic;}
+.modal-progress-track{height:6px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden;}
+.modal-progress-fill{height:100%;background:linear-gradient(to right,var(--deep-rose),var(--gold));border-radius:4px;transition:width 0.5s ease;}
+
+.synopsis{color:rgba(245,237,224,0.75);line-height:1.85;font-size:0.97rem;border-top:1px solid var(--border);padding-top:18px;margin-top:16px;}
 .synopsis p+p{margin-top:10px;}
 .btn-primary{background:linear-gradient(135deg,var(--deep-rose),var(--rose));color:white;border:none;padding:12px 26px;border-radius:30px;font-family:'Cormorant Garamond',serif;font-size:1rem;cursor:pointer;transition:all 0.3s;display:inline-flex;align-items:center;gap:8px;margin-top:20px;}
 .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(160,67,90,0.4);}
 .empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
 .empty-state .icon{font-size:3rem;margin-bottom:14px;opacity:0.4;}
+.book-card:nth-child(1){animation-delay:0.1s;}.book-card:nth-child(2){animation-delay:0.2s;}.book-card:nth-child(3){animation-delay:0.3s;}.book-card:nth-child(4){animation-delay:0.4s;}.book-card:nth-child(5){animation-delay:0.5s;}.book-card:nth-child(6){animation-delay:0.6s;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
 @media(max-width:600px){.topbar-nav .nav-text{display:none;}.books-grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:16px;}.modal-top{flex-direction:column;align-items:center;text-align:center;}.modal{padding:28px 18px;}}
 </style>
@@ -70,8 +94,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
     <a href="calendario.html" class="nav-link">📅<span class="nav-text"> Agenda</span></a>
     <a href="diario.html" class="nav-link">💭<span class="nav-text"> Diario</span></a>
     <a href="album.html" class="nav-link">🖼️<span class="nav-text"> Álbum</span></a>
-    <a href="wishlist.html" class="nav-link">✨<span class="nav-text"> Wishlist</span></a>
-    <a href="mood.html" class="nav-link">🌙<span class="nav-text"> Mood</span></a>
   </nav>
 </header>
 <div class="page-body">
@@ -81,7 +103,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
   </div>
   <div class="books-grid" id="booksGrid"><div class="empty-state"><div class="icon">📚</div><p>Cargando...</p></div></div>
 </div>
-<!-- MODAL -->
+
 <div class="modal-overlay" id="bookModal">
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">✕</button>
@@ -91,55 +113,105 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
         <h2 id="mTitle"></h2>
         <p class="author" id="mAuthor"></p>
         <div class="tags" id="mTags"></div>
+        <div class="modal-progress" id="mProgress" style="display:none">
+          <div class="modal-progress-label"><span>Progreso de lectura</span><span id="mPct">0%</span></div>
+          <div class="modal-progress-track"><div class="modal-progress-fill" id="mFill"></div></div>
+        </div>
       </div>
     </div>
     <div class="synopsis" id="mSynopsis"></div>
     <button class="btn-primary" id="mReadBtn">📖 Leer ahora</button>
   </div>
 </div>
+
 <script>
 const COLORS=['linear-gradient(160deg,#1a0a0f 0%,#3d0d1c 40%,#8b1a35 100%)','linear-gradient(160deg,#0a1628 0%,#1a3a6b 50%,#2d5a9b 100%)','linear-gradient(160deg,#0d1f0a 0%,#1a4a10 50%,#2d7a1c 100%)','linear-gradient(160deg,#1a1205 0%,#4a3010 50%,#7a5018 100%)','linear-gradient(160deg,#1a0a1a 0%,#3d1050 50%,#6b1a8b 100%)'];
-async function load(){
-  try{
-    const r=await fetch('libros.json?'+Date.now());
-    const d=await r.json();
-    const libros=d.libros||[];
-    document.getElementById('librosDesc').textContent=d.descripcion||`${libros.length} libro${libros.length!==1?'s':''} esperándote`;
-    window._libros=libros;
-    if(!libros.length){document.getElementById('booksGrid').innerHTML='<div class="empty-state"><div class="icon">📚</div><p>Pronto habrá libros aquí para ti...</p></div>';return;}
-    document.getElementById('booksGrid').innerHTML=libros.map((b,i)=>{
-      const c=COLORS[i%COLORS.length];
+
+function getProgress(pdfUrl, totalPagesEst) {
+  const saved = localStorage.getItem('lorena_page_' + pdfUrl);
+  if (!saved) return 0;
+  const page = parseInt(saved);
+  // We estimate total from a stored key set when PDF loads
+  const total = parseInt(localStorage.getItem('lorena_total_' + pdfUrl)) || 0;
+  if (!total) return -1; // started but total unknown
+  return Math.min(Math.round((page / total) * 100), 100);
+}
+
+async function load() {
+  try {
+    const r = await fetch('libros.json?' + Date.now());
+    const d = await r.json();
+    const libros = d.libros || [];
+    document.getElementById('librosDesc').textContent = d.descripcion || `${libros.length} libro${libros.length!==1?'s':''} esperándote`;
+    window._libros = libros;
+    if (!libros.length) { document.getElementById('booksGrid').innerHTML='<div class="empty-state"><div class="icon">📚</div><p>Pronto habrá libros aquí...</p></div>'; return; }
+    document.getElementById('booksGrid').innerHTML = libros.map((b, i) => {
+      const c = COLORS[i % COLORS.length];
+      const pct = getProgress(b.pdf_url);
+      const started = pct > 0 || pct === -1;
+      const done = pct >= 100;
+      const pctLabel = pct > 0 ? pct + '%' : (pct === -1 ? '...' : '');
       return `<div class="book-card" onclick="openBook(${i})">
-        <div class="book-cover" style="background:${c}">
-          ${b.portada?`<img class="book-cover-img" src="${b.portada}" onerror="this.style.display='none'">`:''}
-          <span class="book-cover-title">${b.titulo}</span>
-          <span class="book-cover-author">${b.autor}</span>
+        <div class="book-cover-wrap">
+          <div class="book-cover" style="background:${c}">
+            ${b.portada?`<img class="book-cover-img" src="${b.portada}" onerror="this.style.display='none'">`:''}
+            <span class="book-cover-title">${b.titulo}</span>
+            <span class="book-cover-author">${b.autor}</span>
+          </div>
+          ${started && !done ? `<span class="badge-started">Leyendo</span>` : ''}
+          ${done ? `<span class="badge-started badge-done">✓ Terminado</span>` : ''}
+          ${pct > 0 ? `
+            <div class="book-progress-wrap">
+              <div class="book-progress-bar" style="width:${pct}%"></div>
+            </div>
+            <span class="book-progress-label">${pctLabel}</span>
+          ` : ''}
         </div>
         <div class="book-meta"><h3>${b.titulo}</h3><p>${b.autor}</p></div>
       </div>`;
     }).join('');
-  }catch(e){document.getElementById('booksGrid').innerHTML='<div class="empty-state"><div class="icon">📚</div><p>No se pudieron cargar los libros.</p></div>';}
+  } catch(e) { document.getElementById('booksGrid').innerHTML='<div class="empty-state"><div class="icon">📚</div><p>No se pudieron cargar los libros.</p></div>'; }
 }
-function openBook(i){
-  const b=window._libros[i];
-  const c=COLORS[i%COLORS.length];
-  document.getElementById('mCover').innerHTML=b.portada
-    ?`<img src="${b.portada}" onerror="this.parentElement.innerHTML='<div class=modal-cover-fb style=background:${c.replace(/'/g,'')}>${b.titulo}</div>'">`
-    :`<div class="modal-cover-fb" style="background:${c}">${b.titulo}</div>`;
-  document.getElementById('mTitle').textContent=b.titulo;
-  document.getElementById('mAuthor').textContent=b.autor;
-  document.getElementById('mTags').innerHTML=(b.generos||[]).map(g=>`<span class="tag">${g}</span>`).join('');
-  document.getElementById('mSynopsis').innerHTML=(b.sinopsis||'').split('\n').map(p=>`<p>${p}</p>`).join('');
-  document.getElementById('mReadBtn').onclick=()=>{
+
+function openBook(i) {
+  const b = window._libros[i];
+  const c = COLORS[i % COLORS.length];
+  document.getElementById('mCover').innerHTML = b.portada
+    ? `<img src="${b.portada}" onerror="this.parentElement.innerHTML='<div class=modal-cover-fb style=background:${c.replace(/'/g,'')}>${b.titulo}</div>'">`
+    : `<div class="modal-cover-fb" style="background:${c}">${b.titulo}</div>`;
+  document.getElementById('mTitle').textContent  = b.titulo;
+  document.getElementById('mAuthor').textContent = b.autor;
+  document.getElementById('mTags').innerHTML = (b.generos||[]).map(g=>`<span class="tag">${g}</span>`).join('');
+  document.getElementById('mSynopsis').innerHTML = (b.sinopsis||'').split('\n').map(p=>`<p>${p}</p>`).join('');
+
+  // Progress
+  const pct = getProgress(b.pdf_url);
+  const prog = document.getElementById('mProgress');
+  if (pct > 0) {
+    prog.style.display = 'block';
+    document.getElementById('mPct').textContent = pct + '%';
+    setTimeout(() => document.getElementById('mFill').style.width = pct + '%', 100);
+  } else if (pct === -1) {
+    prog.style.display = 'block';
+    document.getElementById('mPct').textContent = 'En progreso';
+    setTimeout(() => document.getElementById('mFill').style.width = '5%', 100);
+  } else {
+    prog.style.display = 'none';
+    document.getElementById('mFill').style.width = '0%';
+  }
+
+  document.getElementById('mReadBtn').textContent = pct > 0 ? '📖 Continuar leyendo' : '📖 Leer ahora';
+  document.getElementById('mReadBtn').onclick = () => {
     closeModal();
-    localStorage.setItem('lorena_libro_actual',JSON.stringify(b));
-    window.location.href='lector-libro.html';
+    localStorage.setItem('lorena_libro_actual', JSON.stringify(b));
+    window.location.href = 'lector-libro.html';
   };
   document.getElementById('bookModal').classList.add('active');
-  document.body.style.overflow='hidden';
+  document.body.style.overflow = 'hidden';
 }
-function closeModal(){document.getElementById('bookModal').classList.remove('active');document.body.style.overflow='';}
-document.getElementById('bookModal').addEventListener('click',e=>{if(e.target===document.getElementById('bookModal'))closeModal();});
+
+function closeModal() { document.getElementById('bookModal').classList.remove('active'); document.body.style.overflow = ''; }
+document.getElementById('bookModal').addEventListener('click', e => { if(e.target===document.getElementById('bookModal')) closeModal(); });
 load();
 </script>
 </body>

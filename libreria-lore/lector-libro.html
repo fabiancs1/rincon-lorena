@@ -286,6 +286,7 @@ async function startLoad(file) {
     const url = URL.createObjectURL(file);
     pdfDoc = await pdfjsLib.getDocument(url).promise;
     totalPages = pdfDoc.numPages;
+    localStorage.setItem('lorena_total_' + PDF_NAME, totalPages);
 
     document.getElementById('loadScreen').style.display = 'none';
     document.getElementById('topbar').style.display = 'flex';

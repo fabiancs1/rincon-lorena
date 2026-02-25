@@ -17,45 +17,79 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 .nav-link:hover{color:var(--cream);}
 .nav-link.active{color:var(--gold);border-color:rgba(201,168,76,0.25);background:var(--soft-gold);}
 .page-body{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:40px 20px 80px;}
-.page-header{margin-bottom:30px;}
+.page-header{margin-bottom:24px;}
 .page-header h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,2.6rem);}
 .page-header h1 em{color:var(--rose);font-style:italic;}
-.page-header p{color:var(--muted);font-style:italic;margin-top:6px;border-left:2px solid var(--gold);padding-left:12px;}
+
+/* UPCOMING SPECIAL DATES */
+.upcoming-strip{display:flex;gap:10px;overflow-x:auto;margin-bottom:24px;padding-bottom:4px;scrollbar-width:none;}
+.upcoming-strip::-webkit-scrollbar{display:none;}
+.upcoming-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 18px;flex-shrink:0;min-width:150px;text-align:center;position:relative;overflow:hidden;}
+.upcoming-card.special{border-color:rgba(201,168,76,0.35);background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(160,67,90,0.06));}
+.upcoming-card.today-special{border-color:var(--rose);animation:glowPulse 2s ease-in-out infinite;}
+@keyframes glowPulse{0%,100%{box-shadow:0 0 0 rgba(212,120,154,0);}50%{box-shadow:0 0 18px rgba(212,120,154,0.3);}}
+.upcoming-card .up-days{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--gold);line-height:1;}
+.upcoming-card .up-label{font-size:0.7rem;color:var(--muted);margin-top:2px;font-style:italic;}
+.upcoming-card .up-name{font-size:0.82rem;color:var(--cream);margin-top:6px;font-style:italic;}
+
 /* CALENDAR */
-.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
-.cal-nav h2{font-family:'Playfair Display',serif;font-size:1.3rem;font-style:italic;color:var(--gold);}
-.cal-btn{background:none;border:1px solid var(--border);color:var(--gold);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1rem;transition:all 0.2s;display:flex;align-items:center;justify-content:center;}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.cal-nav h2{font-family:'Playfair Display',serif;font-size:1.25rem;font-style:italic;color:var(--gold);}
+.cal-btn{background:none;border:1px solid var(--border);color:var(--gold);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:1rem;transition:all 0.2s;display:flex;align-items:center;justify-content:center;}
 .cal-btn:hover{background:var(--soft-gold);}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:30px;}
-.cal-day-name{text-align:center;font-size:0.68rem;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;padding:8px 0;}
-.cal-day{aspect-ratio:1;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;font-size:0.88rem;position:relative;border:1px solid transparent;}
-.cal-day:hover{background:var(--surface);border-color:var(--border);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:28px;}
+.cal-day-name{text-align:center;font-size:0.65rem;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;padding:8px 0;}
+.cal-day{aspect-ratio:1;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;font-size:0.85rem;position:relative;border:1px solid transparent;}
+.cal-day:hover:not(.empty){background:var(--surface);border-color:var(--border);}
 .cal-day.today{background:rgba(212,120,154,0.15);border-color:var(--border-rose);color:var(--rose);font-weight:600;}
-.cal-day.has-event::after{content:'';position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--gold);}
+.cal-day.has-event::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--rose);}
+.cal-day.special-date{background:rgba(201,168,76,0.1);border-color:rgba(201,168,76,0.3);color:var(--gold);}
+.cal-day.special-date::before{content:'✦';position:absolute;top:1px;right:3px;font-size:0.45rem;color:var(--gold);opacity:0.7;}
 .cal-day.selected{background:var(--surface2);border-color:var(--rose);}
+.cal-day.other-month{opacity:0.2;cursor:default;}
 .cal-day.empty{cursor:default;}
-.cal-day.other-month{opacity:0.25;}
-/* EVENTS */
-.events-panel{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px;}
-.events-panel h3{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--cream);margin-bottom:16px;}
+
+/* LEGEND */
+.cal-legend{display:flex;gap:16px;margin-bottom:18px;font-size:0.72rem;color:var(--muted);flex-wrap:wrap;}
+.legend-item{display:flex;align-items:center;gap:6px;}
+.legend-dot{width:10px;height:10px;border-radius:3px;}
+
+/* EVENTS PANEL */
+.events-panel{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px;}
+.events-panel h3{font-family:'Playfair Display',serif;font-size:1rem;color:var(--cream);margin-bottom:14px;}
 .events-panel h3 span{color:var(--rose);font-style:italic;}
-.event-list{display:flex;flex-direction:column;gap:10px;margin-bottom:18px;min-height:40px;}
-.event-item{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;}
+.event-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;min-height:36px;}
+.event-item{background:var(--surface2);border:1px solid var(--border);border-radius:11px;padding:11px 14px;display:flex;align-items:center;gap:10px;}
+.event-item.is-special{border-color:rgba(201,168,76,0.3);background:rgba(201,168,76,0.05);}
 .event-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.event-text{flex:1;font-size:0.9rem;color:var(--cream);}
-.event-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:4px;transition:color 0.2s;}
+.event-text{flex:1;font-size:0.88rem;color:var(--cream);}
+.event-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.9rem;padding:3px;transition:color 0.2s;}
 .event-del:hover{color:var(--rose);}
-.event-empty{color:var(--muted);font-style:italic;font-size:0.88rem;padding:8px 0;}
-/* ADD EVENT */
+.event-empty{color:var(--muted);font-style:italic;font-size:0.85rem;padding:6px 0;}
 .add-event{display:flex;gap:10px;flex-wrap:wrap;}
-.add-event input{flex:1;min-width:180px;background:var(--surface2);border:1px solid var(--border);color:var(--cream);padding:10px 14px;border-radius:12px;font-family:'Cormorant Garamond',serif;font-size:0.95rem;outline:none;transition:border-color 0.2s;}
+.add-event input{flex:1;min-width:160px;background:var(--surface2);border:1px solid var(--border);color:var(--cream);padding:9px 13px;border-radius:11px;font-family:'Cormorant Garamond',serif;font-size:0.92rem;outline:none;transition:border-color 0.2s;}
 .add-event input::placeholder{color:var(--muted);}
 .add-event input:focus{border-color:var(--border-rose);}
-.add-event select{background:var(--surface2);border:1px solid var(--border);color:var(--cream);padding:10px 12px;border-radius:12px;font-family:'Cormorant Garamond',serif;font-size:0.9rem;outline:none;cursor:pointer;}
-.btn-add{background:linear-gradient(135deg,var(--deep-rose),var(--rose));color:white;border:none;padding:10px 20px;border-radius:12px;font-family:'Cormorant Garamond',serif;font-size:0.95rem;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
-.btn-add:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(160,67,90,0.35);}
-@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
-@media(max-width:600px){.topbar-nav .nav-text{display:none;}.cal-day{font-size:0.78rem;border-radius:8px;}.add-event{flex-direction:column;}}
+.add-event select{background:var(--surface2);border:1px solid var(--border);color:var(--cream);padding:9px 10px;border-radius:11px;font-family:'Cormorant Garamond',serif;font-size:0.88rem;outline:none;cursor:pointer;}
+.btn-add{background:linear-gradient(135deg,var(--deep-rose),var(--rose));color:white;border:none;padding:9px 18px;border-radius:11px;font-family:'Cormorant Garamond',serif;font-size:0.92rem;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.btn-add:hover{transform:translateY(-1px);}
+
+/* SPECIAL DATES SECTION — editable */
+.special-section{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px;margin-top:24px;}
+.special-section h3{font-family:'Playfair Display',serif;font-size:1rem;margin-bottom:16px;color:var(--gold);}
+.special-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+.special-item{display:flex;align-items:center;gap:10px;background:var(--surface2);border-radius:11px;padding:10px 14px;}
+.special-item-name{flex:1;font-size:0.88rem;}
+.special-item-date{font-size:0.75rem;color:var(--gold);font-style:italic;}
+.special-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.85rem;transition:color 0.2s;}
+.special-del:hover{color:var(--rose);}
+.add-special{display:flex;gap:8px;flex-wrap:wrap;}
+.add-special input{flex:1;min-width:130px;background:var(--surface2);border:1px solid var(--border);color:var(--cream);padding:9px 12px;border-radius:11px;font-family:'Cormorant Garamond',serif;font-size:0.9rem;outline:none;}
+.add-special input::placeholder{color:var(--muted);}
+.add-special input:focus{border-color:var(--border-rose);}
+.add-special input[type="date"]{color-scheme:dark;}
+
+@media(max-width:600px){.topbar-nav .nav-text{display:none;}.cal-day{font-size:0.75rem;border-radius:7px;}.add-event,.add-special{flex-direction:column;}}
 </style>
 </head>
 <body>
@@ -68,129 +102,274 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
     <a href="calendario.html" class="nav-link active">📅<span class="nav-text"> Agenda</span></a>
     <a href="diario.html" class="nav-link">💭<span class="nav-text"> Diario</span></a>
     <a href="album.html" class="nav-link">🖼️<span class="nav-text"> Álbum</span></a>
-    <a href="wishlist.html" class="nav-link">✨<span class="nav-text"> Wishlist</span></a>
-    <a href="mood.html" class="nav-link">🌙<span class="nav-text"> Mood</span></a>
   </nav>
 </header>
 <div class="page-body">
   <div class="page-header">
     <h1>Tu <em>Agenda</em> 📅</h1>
-    <p>Tus eventos, recordatorios y fechas importantes</p>
   </div>
+
+  <!-- UPCOMING SPECIAL DATES -->
+  <div class="upcoming-strip" id="upcomingStrip"></div>
+
+  <!-- CALENDAR -->
   <div class="cal-nav">
     <button class="cal-btn" onclick="changeMonth(-1)">‹</button>
     <h2 id="calTitle"></h2>
     <button class="cal-btn" onclick="changeMonth(1)">›</button>
   </div>
+
+  <!-- LEGEND -->
+  <div class="cal-legend">
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(212,120,154,0.5)"></div> Hoy</div>
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(201,168,76,0.4)"></div> Fecha especial</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--rose)"></div> Evento tuyo</div>
+  </div>
+
   <div class="cal-grid" id="calGrid"></div>
+
+  <!-- EVENTS PANEL -->
   <div class="events-panel">
     <h3>Eventos del <span id="selectedDateLabel">día</span></h3>
     <div class="event-list" id="eventList"></div>
     <div class="add-event">
-      <input type="text" id="eventInput" placeholder="Agregar evento o recordatorio..." maxlength="80">
+      <input type="text" id="eventInput" placeholder="Agregar evento..." maxlength="80">
       <select id="eventColor">
         <option value="#d4789a">🌸 Rosa</option>
         <option value="#c9a84c">✨ Dorado</option>
         <option value="#7ab8d4">💙 Azul</option>
         <option value="#7ad4a0">💚 Verde</option>
-        <option value="#d4a87a">🍊 Naranja</option>
       </select>
       <button class="btn-add" onclick="addEvent()">+ Agregar</button>
     </div>
   </div>
-</div>
-<script type="module">
-import { db } from './firebase-config.js';
-import { ref, get, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
+  <!-- SPECIAL DATES MANAGER -->
+  <div class="special-section">
+    <h3>✦ Fechas especiales</h3>
+    <div class="special-list" id="specialList"></div>
+    <div class="add-special">
+      <input type="text" id="spName" placeholder="Ej: Nuestro aniversario..." maxlength="40">
+      <input type="date" id="spDate">
+      <button class="btn-add" onclick="addSpecial()">+ Agregar</button>
+    </div>
+  </div>
+</div>
+
+<script>
 const MONTHS=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const DAYS=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-let cur=new Date();let viewYear=cur.getFullYear();let viewMonth=cur.getMonth();
-let selectedDate=`${cur.getFullYear()}-${String(cur.getMonth()+1).padStart(2,'0')}-${String(cur.getDate()).padStart(2,'0')}`;
-let _events = {};
+const today = new Date();
+let viewYear = today.getFullYear();
+let viewMonth = today.getMonth();
+let selectedDate = toKey(today);
 
-async function loadEvents() {
-  try {
-    const snap = await get(ref(db, 'calendario/events'));
-    _events = snap.exists() ? snap.val() : {};
-  } catch(e) { _events = {}; }
-}
-function getEvents() { return _events; }
-async function saveEvents(e) {
-  _events = e;
-  await set(ref(db, 'calendario/events'), e);
+function toKey(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+
+function getEvents(){ try{ return JSON.parse(localStorage.getItem('lorena_events')||'{}'); }catch{ return {}; } }
+function saveEvents(e){ localStorage.setItem('lorena_events', JSON.stringify(e)); }
+
+function getSpecials(){ try{ return JSON.parse(localStorage.getItem('lorena_specials')||'[]'); }catch{ return []; } }
+function saveSpecials(s){ localStorage.setItem('lorena_specials', JSON.stringify(s)); }
+
+// Build set of special MM-DD keys (recurring yearly) and YYYY-MM-DD (one-time)
+function specialDaySet(){
+  const specials = getSpecials();
+  const set = new Set();
+  specials.forEach(s => {
+    const parts = s.date.split('-');
+    // Add as MM-DD for yearly recurrence
+    set.add(`${parts[1]}-${parts[2]}`);
+    // Also add full date
+    set.add(s.date);
+  });
+  return set;
 }
 
+function isSpecialDay(key){
+  const set = specialDaySet();
+  const mmdd = key.slice(5); // MM-DD
+  return set.has(key) || set.has(mmdd);
+}
+
+function getSpecialName(key){
+  const specials = getSpecials();
+  const mmdd = key.slice(5);
+  const match = specials.find(s => s.date === key || s.date.slice(5) === mmdd);
+  return match ? match.name : null;
+}
+
+// ── UPCOMING STRIP ────────────────────────────────────
+async function renderUpcoming(){
+  const specials = getSpecials();
+
+  // Load relationship date from config
+  let extraSpecials = [...specials];
+  try{
+    const r = await fetch('config.json?' + Date.now());
+    const cfg = await r.json();
+    if(cfg.fecha_inicio_relacion){
+      extraSpecials.unshift({ name: '💑 Aniversario', date: cfg.fecha_inicio_relacion.slice(5) });
+    }
+    if(cfg.fechas_especiales){
+      extraSpecials = [...cfg.fechas_especiales, ...extraSpecials];
+    }
+  }catch(e){}
+
+  const strip = document.getElementById('upcomingStrip');
+  if(!extraSpecials.length){ strip.style.display='none'; return; }
+
+  const cards = extraSpecials.map(s => {
+    const parts = s.date.includes('-') ? s.date.split('-') : null;
+    if(!parts) return '';
+    // Yearly: find next occurrence
+    const isYearly = parts.length === 2; // MM-DD
+    let nextDate;
+    if(isYearly){
+      nextDate = new Date(today.getFullYear(), parseInt(parts[0])-1, parseInt(parts[1]));
+      if(nextDate < today) nextDate = new Date(today.getFullYear()+1, parseInt(parts[0])-1, parseInt(parts[1]));
+    } else {
+      nextDate = new Date(parts[0], parseInt(parts[1])-1, parseInt(parts[2]));
+    }
+    const diffDays = Math.round((nextDate - today) / (1000*60*60*24));
+    const isToday = diffDays === 0;
+    const daysLabel = isToday ? '¡HOY! 🎉' : diffDays === 1 ? 'Mañana' : `${diffDays} días`;
+    return `<div class="upcoming-card${isSpecialDay(toKey(nextDate))?' special':''}${isToday?' today-special':''}">
+      <div class="up-days">${daysLabel}</div>
+      <div class="up-label">${nextDate.toLocaleDateString('es-ES',{day:'numeric',month:'short'})}</div>
+      <div class="up-name">${s.name}</div>
+    </div>`;
+  }).filter(Boolean);
+
+  strip.innerHTML = cards.join('') || '';
+  if(!cards.length) strip.style.display = 'none';
+}
+
+// ── CALENDAR ──────────────────────────────────────────
 function buildCal(){
-  document.getElementById('calTitle').textContent=`${MONTHS[viewMonth]} ${viewYear}`;
-  const grid=document.getElementById('calGrid');
-  let html=DAYS.map(d=>`<div class="cal-day-name">${d}</div>`).join('');
-  const first=new Date(viewYear,viewMonth,1).getDay();
-  const daysInMonth=new Date(viewYear,viewMonth+1,0).getDate();
-  const prevDays=new Date(viewYear,viewMonth,0).getDate();
-  const events=getEvents();
+  document.getElementById('calTitle').textContent = `${MONTHS[viewMonth]} ${viewYear}`;
+  const grid = document.getElementById('calGrid');
+  let html = DAYS.map(d=>`<div class="cal-day-name">${d}</div>`).join('');
+  const first = new Date(viewYear, viewMonth, 1).getDay();
+  const daysInMonth = new Date(viewYear, viewMonth+1, 0).getDate();
+  const prevDays = new Date(viewYear, viewMonth, 0).getDate();
+  const events = getEvents();
+  const todayKey = toKey(today);
+
   for(let i=0;i<first;i++){
-    const day=prevDays-first+i+1;
-    html+=`<div class="cal-day other-month empty">${day}</div>`;
+    html += `<div class="cal-day other-month empty">${prevDays-first+i+1}</div>`;
   }
   for(let d=1;d<=daysInMonth;d++){
-    const key=`${viewYear}-${String(viewMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const isToday=key===`${cur.getFullYear()}-${String(cur.getMonth()+1).padStart(2,'0')}-${String(cur.getDate()).padStart(2,'0')}`;
-    const hasEv=events[key]&&events[key].length>0;
-    const isSel=key===selectedDate;
-    html+=`<div class="cal-day${isToday?' today':''}${hasEv?' has-event':''}${isSel?' selected':''}" onclick="selectDay('${key}',${d})">${d}</div>`;
+    const key = `${viewYear}-${String(viewMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = key === todayKey;
+    const hasEv = events[key] && events[key].length > 0;
+    const isSpec = isSpecialDay(key);
+    const isSel = key === selectedDate;
+    let cls = 'cal-day';
+    if(isToday) cls += ' today';
+    if(isSpec) cls += ' special-date';
+    if(hasEv) cls += ' has-event';
+    if(isSel) cls += ' selected';
+    html += `<div class="${cls}" onclick="selectDay('${key}')">${d}</div>`;
   }
-  const total=first+daysInMonth;const remaining=(7-total%7)%7;
-  for(let i=1;i<=remaining;i++) html+=`<div class="cal-day other-month empty">${i}</div>`;
-  grid.innerHTML=html;
+  const total = first + daysInMonth;
+  const rem = (7 - total%7) % 7;
+  for(let i=1;i<=rem;i++) html += `<div class="cal-day other-month empty">${i}</div>`;
+  grid.innerHTML = html;
   renderEvents();
 }
 
-window.selectDay = function(key,d) {
-  selectedDate=key;
-  buildCal();
-};
+function selectDay(key){ selectedDate = key; buildCal(); }
 
 function renderEvents(){
-  const events=getEvents();
-  const list=document.getElementById('eventList');
-  const evs=events[selectedDate]||[];
-  const parts=selectedDate.split('-');
-  document.getElementById('selectedDateLabel').textContent=`${parseInt(parts[2])} de ${MONTHS[parseInt(parts[1])-1]}`;
-  if(!evs.length){list.innerHTML='<p class="event-empty">Sin eventos para este día ✨</p>';return;}
-  list.innerHTML=evs.map((e,i)=>`
-    <div class="event-item">
-      <div class="event-dot" style="background:${e.color||'var(--rose)'}"></div>
-      <span class="event-text">${e.text}</span>
-      <button class="event-del" onclick="delEvent(${i})" title="Eliminar">✕</button>
-    </div>`).join('');
+  const events = getEvents();
+  const list = document.getElementById('eventList');
+  const parts = selectedDate.split('-');
+  document.getElementById('selectedDateLabel').textContent = `${parseInt(parts[2])} de ${MONTHS[parseInt(parts[1])-1]}`;
+  const evs = events[selectedDate] || [];
+
+  // Check if special date
+  const specialName = getSpecialName(selectedDate);
+  let html = '';
+  if(specialName){
+    html += `<div class="event-item is-special"><div class="event-dot" style="background:var(--gold)"></div><span class="event-text">✦ ${specialName}</span></div>`;
+  }
+  if(!evs.length && !specialName){ list.innerHTML='<p class="event-empty">Sin eventos para este día ✨</p>'; return; }
+  html += evs.map((e,i)=>`<div class="event-item">
+    <div class="event-dot" style="background:${e.color||'var(--rose)'}"></div>
+    <span class="event-text">${e.text}</span>
+    <button class="event-del" onclick="delEvent(${i})">✕</button>
+  </div>`).join('');
+  list.innerHTML = html;
 }
 
-window.addEvent = async function(){
-  const inp=document.getElementById('eventInput');
-  const txt=inp.value.trim();
-  if(!txt)return;
-  const color=document.getElementById('eventColor').value;
-  const events=getEvents();
-  if(!events[selectedDate])events[selectedDate]=[];
-  events[selectedDate].push({text:txt,color});
-  await saveEvents(events);
-  inp.value='';
+function addEvent(){
+  const inp = document.getElementById('eventInput');
+  const txt = inp.value.trim(); if(!txt) return;
+  const color = document.getElementById('eventColor').value;
+  const events = getEvents();
+  if(!events[selectedDate]) events[selectedDate] = [];
+  events[selectedDate].push({text:txt, color});
+  saveEvents(events);
+  inp.value = '';
   buildCal();
-};
+}
 
-window.delEvent = async function(i){
-  const events=getEvents();
-  if(events[selectedDate]){events[selectedDate].splice(i,1);if(!events[selectedDate].length)delete events[selectedDate];}
-  await saveEvents(events);buildCal();
-};
+function delEvent(i){
+  const events = getEvents();
+  if(events[selectedDate]){ events[selectedDate].splice(i,1); if(!events[selectedDate].length) delete events[selectedDate]; }
+  saveEvents(events); buildCal();
+}
 
-window.changeMonth = function(d){viewMonth+=d;if(viewMonth>11){viewMonth=0;viewYear++;}else if(viewMonth<0){viewMonth=11;viewYear--;}buildCal();}
-document.getElementById('eventInput').addEventListener('keydown',e=>{if(e.key==='Enter')window.addEvent();});
+function changeMonth(d){ viewMonth+=d; if(viewMonth>11){viewMonth=0;viewYear++;}else if(viewMonth<0){viewMonth=11;viewYear--;} buildCal(); }
+document.getElementById('eventInput').addEventListener('keydown', e => { if(e.key==='Enter') addEvent(); });
 
-// Iniciar
-await loadEvents();
+// ── SPECIAL DATES ─────────────────────────────────────
+function renderSpecials(){
+  const specials = getSpecials();
+  const list = document.getElementById('specialList');
+  if(!specials.length){ list.innerHTML='<p style="color:var(--muted);font-style:italic;font-size:0.85rem;padding:6px 0">Agrega tus fechas especiales abajo ✦</p>'; return; }
+  list.innerHTML = specials.map((s,i) => {
+    const parts = s.date.split('-');
+    const isYearly = parts.length === 2;
+    const label = isYearly
+      ? `cada ${new Date(2000,parseInt(parts[0])-1,parseInt(parts[1])).toLocaleDateString('es-ES',{day:'numeric',month:'long'})}`
+      : new Date(parts[0],parseInt(parts[1])-1,parseInt(parts[2])).toLocaleDateString('es-ES',{day:'numeric',month:'long',year:'numeric'});
+    return `<div class="special-item">
+      <span style="font-size:1rem">✦</span>
+      <span class="special-item-name">${s.name}</span>
+      <span class="special-item-date">${label}</span>
+      <button class="special-del" onclick="delSpecial(${i})">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function addSpecial(){
+  const name = document.getElementById('spName').value.trim();
+  const dateVal = document.getElementById('spDate').value;
+  if(!name || !dateVal) return;
+  // Store as MM-DD for yearly, or YYYY-MM-DD for one-time
+  const parts = dateVal.split('-');
+  const dateStored = parts[1] + '-' + parts[2]; // MM-DD = yearly
+  const specials = getSpecials();
+  specials.push({ name, date: dateStored });
+  saveSpecials(specials);
+  document.getElementById('spName').value = '';
+  document.getElementById('spDate').value = '';
+  renderSpecials();
+  buildCal();
+  renderUpcoming();
+}
+
+function delSpecial(i){
+  const specials = getSpecials(); specials.splice(i,1); saveSpecials(specials);
+  renderSpecials(); buildCal(); renderUpcoming();
+}
+
+// ── INIT ──────────────────────────────────────────────
+renderUpcoming();
 buildCal();
+renderSpecials();
 </script>
 </body>
 </html>
