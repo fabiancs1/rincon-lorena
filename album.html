@@ -158,11 +158,18 @@ function closeTip() {
 
 function loadPhotos() {
   if (localStorage.getItem('lorena_album_tip')) document.getElementById('tipBanner').style.display = 'none';
-  try { photos = JSON.parse(localStorage.getItem('lorena_album') || '[]'); } catch { photos = []; }
+  loadPhotos_cloud();
+  return; // cloud will call renderGrid
+}
+async function loadPhotos_cloud() {
+  try {
+    const r = await window.storage.get('lorena_album', true);
+    photos = r ? JSON.parse(r.value) : [];
+  } catch { photos = []; }
   renderGrid();
 }
 
-function savePhotosLS() { localStorage.setItem('lorena_album', JSON.stringify(photos)); }
+async function savePhotosLS() { try { await window.storage.set('lorena_album', JSON.stringify(photos), true); } catch(e) { console.error('Error guardando:', e); } }
 
 function renderGrid() {
   const grid = document.getElementById('photoGrid');

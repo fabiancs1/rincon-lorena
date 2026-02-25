@@ -199,12 +199,15 @@ let currentCat = '';
 const CATS = ['Ropa','Zapatos','Accesorios','Belleza','Libros','Hogar','Tecnología','Otro'];
 const CAT_EMOJI = {Ropa:'👗',Zapatos:'👠',Accesorios:'💍',Belleza:'💄',Libros:'📚',Hogar:'🏠','Tecnología':'📱',Otro:'🌸'};
 
-function load() {
-  try { items = JSON.parse(localStorage.getItem('lorena_wishlist') || '[]'); } catch { items = []; }
+async function load() {
+  try {
+    const r = await window.storage.get('lorena_wishlist', true);
+    items = r ? JSON.parse(r.value) : [];
+  } catch { items = []; }
   buildCatFilters();
   render();
 }
-function save() { localStorage.setItem('lorena_wishlist', JSON.stringify(items)); }
+async function save() { try { await window.storage.set('lorena_wishlist', JSON.stringify(items), true); } catch(e) { console.error('Error guardando:', e); } }
 
 function buildCatFilters() {
   const bar = document.getElementById('filtersBar');

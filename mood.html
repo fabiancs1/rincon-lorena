@@ -211,8 +211,11 @@ let todayKey;
 
 function toKey(y, m, d) { return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
 
-function load() {
-  try { data = JSON.parse(localStorage.getItem('lorena_mood') || '{}'); } catch { data = {}; }
+async function load() {
+  try {
+    const r = await window.storage.get('lorena_mood', true);
+    data = r ? JSON.parse(r.value) : {};
+  } catch { data = {}; }
   const now = new Date();
   viewYear = now.getFullYear();
   viewMonth = now.getMonth();
@@ -291,7 +294,7 @@ function editarHoy() {
   checkTodayLogged();
 }
 
-function save() { localStorage.setItem('lorena_mood', JSON.stringify(data)); }
+async function save() { try { await window.storage.set('lorena_mood', JSON.stringify(data), true); } catch(e) { console.error('Error guardando:', e); } }
 
 // CALENDAR
 function changeMonth(d) {

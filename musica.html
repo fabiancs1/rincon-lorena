@@ -122,8 +122,11 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 let musicItems = [];
 let currentTab = 'all';
 
-function load() {
-  try { musicItems = JSON.parse(localStorage.getItem('lorena_musica') || '[]'); } catch { musicItems = []; }
+async function load() {
+  try {
+    const r = await window.storage.get('lorena_musica', true);
+    musicItems = r ? JSON.parse(r.value) : [];
+  } catch { musicItems = []; }
   if (!musicItems.length) loadFromJSON();
   else render();
 }
@@ -147,7 +150,7 @@ async function loadFromJSON() {
   render();
 }
 
-function save() { localStorage.setItem('lorena_musica', JSON.stringify(musicItems)); }
+async function save() { try { await window.storage.set('lorena_musica', JSON.stringify(musicItems), true); } catch(e) { console.error('Error guardando:', e); } }
 
 function setTab(tab, el) {
   currentTab = tab;
