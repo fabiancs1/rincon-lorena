@@ -37,22 +37,8 @@ body { background:var(--bg); font-family:'Cormorant Garamond',serif; color:var(-
 .mobile-reader.active { display:flex; }
 
 .mobile-pages { flex:1; position:relative; overflow:hidden; }
-.m-page { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding:8px; transition:transform 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.35s ease; }
+.m-page { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding:8px; will-change:transform; }
 .m-page canvas { max-width:100%; max-height:100%; object-fit:contain; border-radius:4px; box-shadow:0 8px 32px rgba(0,0,0,0.5); background:var(--page-bg); }
-
-/* Swipe states */
-.m-page.current  { transform:translateX(0); opacity:1; z-index:2; }
-.m-page.next     { transform:translateX(100%); opacity:0; z-index:1; }
-.m-page.prev     { transform:translateX(-100%); opacity:0; z-index:1; }
-.m-page.slide-in-left  { animation:slideInLeft 0.35s cubic-bezier(0.4,0,0.2,1) forwards; }
-.m-page.slide-in-right { animation:slideInRight 0.35s cubic-bezier(0.4,0,0.2,1) forwards; }
-.m-page.slide-out-left  { animation:slideOutLeft 0.35s cubic-bezier(0.4,0,0.2,1) forwards; }
-.m-page.slide-out-right { animation:slideOutRight 0.35s cubic-bezier(0.4,0,0.2,1) forwards; }
-
-@keyframes slideInLeft  { from{transform:translateX(100%);opacity:0} to{transform:translateX(0);opacity:1} }
-@keyframes slideInRight { from{transform:translateX(-100%);opacity:0} to{transform:translateX(0);opacity:1} }
-@keyframes slideOutLeft  { from{transform:translateX(0);opacity:1} to{transform:translateX(-100%);opacity:0} }
-@keyframes slideOutRight { from{transform:translateX(0);opacity:1} to{transform:translateX(100%);opacity:0} }
 
 /* Mobile tap zones */
 .tap-zone { position:absolute; top:0; bottom:0; width:35%; z-index:10; cursor:pointer; display:flex; align-items:center; }
@@ -183,9 +169,8 @@ body { background:var(--bg); font-family:'Cormorant Garamond',serif; color:var(-
   <!-- MOBILE READER -->
   <div class="mobile-reader" id="mobileReader">
     <div class="mobile-pages" id="mobilePages">
-      <div class="m-page current" id="mPageCurrent"><canvas id="mCanvasCurrent"></canvas></div>
-      <div class="m-page next"    id="mPageNext">   <canvas id="mCanvasNext"></canvas></div>
-      <div class="m-page prev"    id="mPagePrev">   <canvas id="mCanvasPrev"></canvas></div>
+      <div class="m-page" id="mPageA"><canvas id="mCanvasA"></canvas></div>
+      <div class="m-page" id="mPageB"><canvas id="mCanvasB"></canvas></div>
     </div>
     <!-- Tap zones -->
     <div class="tap-zone tap-left"  onclick="mPrev()"><div class="tap-arrow">‹</div></div>
@@ -343,18 +328,23 @@ async function initMobile() {
   }, { passive:true });
 }
 
+// ── MOBILE: dos canvas, swap limpio ──────────────────
+// "active" = el canvas visible ahora, "standby" = el que se prepara detrás
+let mActive = 'A'; // 'A' o 'B'
+
+function mActiveCanvas()  { return document.getElementById('mCanvas' + mActive); }
+function mStandbyCanvas() { return document.getElementById('mCanvas' + (mActive === 'A' ? 'B' : 'A')); }
+function mActivePage()    { return document.getElementById('mPage'   + mActive); }
+function mStandbyPage()   { return document.getElementById('mPage'   + (mActive === 'A' ? 'B' : 'A')); }
+
 async function mRenderPage(canvas, pageNum) {
-  if (pageNum < 1 || pageNum > totalPages) {
-    canvas.width = 1; canvas.height = 1; return;
-  }
+  if (pageNum < 1 || pageNum > totalPages) { canvas.width=1; canvas.height=1; return; }
   const page = await pdfDoc.getPage(pageNum);
   const container = document.getElementById('mobilePages');
   const maxW = container.clientWidth - 16;
   const maxH = container.clientHeight - 16;
-  const vp0 = page.getViewport({ scale: 1 });
-  const scaleW = maxW / vp0.width;
-  const scaleH = maxH / vp0.height;
-  const scale = Math.min(scaleW, scaleH) * window.devicePixelRatio;
+  const vp0 = page.getViewport({ scale:1 });
+  const scale = Math.min(maxW / vp0.width, maxH / vp0.height) * window.devicePixelRatio;
   const vp = page.getViewport({ scale });
   canvas.width = vp.width; canvas.height = vp.height;
   canvas.style.width  = (vp.width  / window.devicePixelRatio) + 'px';
@@ -362,79 +352,76 @@ async function mRenderPage(canvas, pageNum) {
   await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
 }
 
-async function mRenderAll() {
-  await mRenderPage(document.getElementById('mCanvasCurrent'), mCurrentPage);
-  mRenderPage(document.getElementById('mCanvasNext'), mCurrentPage + 1);
-  if (mCurrentPage > 1) mRenderPage(document.getElementById('mCanvasPrev'), mCurrentPage - 1);
+async function mShow(pageNum) {
+  // Render into standby canvas (hidden)
+  const standby = mStandbyCanvas();
+  const standbyPage = mStandbyPage();
+  const activePage  = mActivePage();
+
+  await mRenderPage(standby, pageNum);
+
+  // Position standby off screen (right or left based on direction)
+  const goingForward = pageNum > mCurrentPage;
+  standbyPage.style.transition = 'none';
+  standbyPage.style.transform  = `translateX(${goingForward ? '100%' : '-100%'})`;
+  standbyPage.style.opacity    = '1';
+  standbyPage.style.zIndex     = '2';
+
+  // Force reflow so transition fires
+  standbyPage.getBoundingClientRect();
+
+  // Animate both
+  const dur = '0.32s';
+  standbyPage.style.transition = `transform ${dur} ease, opacity ${dur} ease`;
+  activePage.style.transition  = `transform ${dur} ease, opacity ${dur} ease`;
+
+  standbyPage.style.transform = 'translateX(0)';
+  activePage.style.transform  = `translateX(${goingForward ? '-100%' : '100%'})`;
+  activePage.style.opacity    = '0';
+
+  await wait(340);
+
+  // Finalize — hide old active
+  activePage.style.transition = 'none';
+  activePage.style.transform  = 'translateX(100%)';
+  activePage.style.zIndex     = '1';
+
+  // Swap active
+  mActive = mActive === 'A' ? 'B' : 'A';
+  mCurrentPage = pageNum;
+  localStorage.setItem('lorena_page_' + PDF_NAME, mCurrentPage);
   mUpdateUI();
 }
 
 async function mNext() {
   if (isAnimating || mCurrentPage >= totalPages) return;
   isAnimating = true;
-
-  const cur = document.getElementById('mPageCurrent');
-  const nxt = document.getElementById('mPageNext');
-
-  // Make sure next is pre-rendered
-  await mRenderPage(document.getElementById('mCanvasNext'), mCurrentPage + 1);
-
-  // Animate
-  cur.classList.remove('current'); cur.classList.add('slide-out-left');
-  nxt.style.transform = 'translateX(100%)'; nxt.style.opacity = '0';
-  nxt.classList.remove('next');
-  // force reflow
-  nxt.getBoundingClientRect();
-  nxt.classList.add('slide-in-left');
-
-  await wait(370);
-
-  // Swap roles
-  cur.className = 'm-page prev';
-  nxt.className = 'm-page current';
-
-  mCurrentPage++;
-  localStorage.setItem('lorena_page_' + PDF_NAME, mCurrentPage);
-
-  // Pre-render new next
-  mRenderPage(document.getElementById('mCanvasNext'), mCurrentPage + 1);
-  // Update prev canvas
-  const prev = document.getElementById('mPagePrev');
-  prev.className = 'm-page prev';
-  await mRenderPage(document.getElementById('mCanvasPrev'), mCurrentPage - 1);
-
-  mUpdateUI();
+  await mShow(mCurrentPage + 1);
   isAnimating = false;
 }
 
 async function mPrev() {
   if (isAnimating || mCurrentPage <= 1) return;
   isAnimating = true;
-
-  const cur = document.getElementById('mPageCurrent');
-  const prv = document.getElementById('mPagePrev');
-
-  await mRenderPage(document.getElementById('mCanvasPrev'), mCurrentPage - 1);
-
-  cur.classList.remove('current'); cur.classList.add('slide-out-right');
-  prv.classList.remove('prev');
-  prv.getBoundingClientRect();
-  prv.classList.add('slide-in-right');
-
-  await wait(370);
-
-  cur.className = 'm-page next';
-  prv.className = 'm-page current';
-
-  mCurrentPage--;
-  localStorage.setItem('lorena_page_' + PDF_NAME, mCurrentPage);
-
-  mRenderPage(document.getElementById('mCanvasNext'), mCurrentPage + 1);
-  const nxt = document.getElementById('mPageNext');
-  nxt.className = 'm-page next';
-
-  mUpdateUI();
+  await mShow(mCurrentPage - 1);
   isAnimating = false;
+}
+
+async function mRenderAll() {
+  // Render current page into active canvas, show it
+  const activePage = mActivePage();
+  activePage.style.transition = 'none';
+  activePage.style.transform  = 'translateX(0)';
+  activePage.style.opacity    = '1';
+  activePage.style.zIndex     = '2';
+  // Hide standby
+  const standbyPage = mStandbyPage();
+  standbyPage.style.transition = 'none';
+  standbyPage.style.transform  = 'translateX(100%)';
+  standbyPage.style.opacity    = '0';
+  standbyPage.style.zIndex     = '1';
+  await mRenderPage(mActiveCanvas(), mCurrentPage);
+  mUpdateUI();
 }
 
 function mUpdateUI() {
@@ -619,17 +606,9 @@ async function goToBookmark() {
   closeBookmarkMenu();
   if (bookmarkPage === null) return;
   if (isMobile) {
-    const dir = bookmarkPage > mCurrentPage ? 1 : -1;
-    // Jump directly for large gaps
-    if (Math.abs(bookmarkPage - mCurrentPage) > 3) {
-      mCurrentPage = bookmarkPage;
-      await mRenderAll();
-      showToast(`📖 Página ${mCurrentPage}`);
-    } else {
-      while (mCurrentPage !== bookmarkPage) {
-        if (dir > 0) await mNext(); else await mPrev();
-      }
-    }
+    const target = bookmarkPage;
+    mCurrentPage = target - 1; // mShow will increment from here via comparison
+    await mShow(target);
   } else {
     const targetSpread = Math.floor((bookmarkPage - 1) / 2);
     if (targetSpread !== dCurrentSpread) {
