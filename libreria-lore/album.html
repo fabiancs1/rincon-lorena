@@ -109,7 +109,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
   <!-- TIP -->
   <div class="tip-banner" id="tipBanner">
     <span class="tip-icon">💡</span>
-    <span>Las fotos se guardan en este navegador. Para no perderlas, usa <b>Guardar respaldo</b> de vez en cuando y guarda el archivo en tu celular o computador.</span>
+    <span>Las fotos se suben automáticamente a la nube con <b>ImgBB + Firebase</b> 🌹 Estarán disponibles desde cualquier dispositivo.</span>
     <button class="tip-close" onclick="closeTip()">✕</button>
   </div>
 
@@ -146,30 +146,44 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
   </div>
 </div>
 
-<script>
+<script type="module">
+import { db } from './firebase-config.js';
+import { ref, get, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const IMGBB_KEY = "3dec58925d383bab2caebdbb0e2f43e0";
 let photos = [];
 let pendingPhoto = null;
 let lbIndex = 0;
 
-function closeTip() {
+window.closeTip = function() {
   document.getElementById('tipBanner').style.display = 'none';
-  localStorage.setItem('lorena_album_tip', '1');
 }
 
-function loadPhotos() {
-  if (localStorage.getItem('lorena_album_tip')) document.getElementById('tipBanner').style.display = 'none';
-  loadPhotos_cloud();
-  return; // cloud will call renderGrid
-}
-async function loadPhotos_cloud() {
+async function loadPhotos() {
   try {
-    const r = await window.storage.get('lorena_album', true);
-    photos = r ? JSON.parse(r.value) : [];
+    const snap = await get(ref(db, 'album/photos'));
+    photos = snap.exists() ? snap.val() : [];
   } catch { photos = []; }
   renderGrid();
 }
 
-async function savePhotosLS() { try { await window.storage.set('lorena_album', JSON.stringify(photos), true); } catch(e) { console.error('Error guardando:', e); } }
+async function savePhotos() {
+  try { await set(ref(db, 'album/photos'), photos); } catch(e) { console.error('Error guardando:', e); }
+}
+
+async function uploadToImgBB(base64data) {
+  // Quitar el prefijo "data:image/...;base64,"
+  const base64 = base64data.split(',')[1];
+  const formData = new FormData();
+  formData.append('image', base64);
+  const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {
+    method: 'POST',
+    body: formData
+  });
+  const json = await res.json();
+  if (json.success) return json.data.url;
+  throw new Error('ImgBB error');
+}
 
 function renderGrid() {
   const grid = document.getElementById('photoGrid');
@@ -194,7 +208,7 @@ function handleFiles(e) {
   e.target.value = '';
 }
 
-function processNext(files, i) {
+window.processNext = function(files, i) {
   if (i >= files.length) return;
   const reader = new FileReader();
   reader.onload = ev => {
@@ -202,29 +216,43 @@ function processNext(files, i) {
     document.getElementById('capInput').value = '';
     document.getElementById('capOverlay').classList.add('active');
     document.getElementById('capInput').focus();
-    window._pendingNext = () => processNext(files, i + 1);
+    window._pendingNext = () => window.processNext(files, i + 1);
   };
   reader.readAsDataURL(files[i]);
 }
 
-function savePhoto(caption) {
+window.savePhoto = async function(caption) {
   if (!pendingPhoto) return;
+  const btn = document.querySelector('.btn-confirm');
+  if (btn) { btn.textContent = 'Subiendo... ⏳'; btn.disabled = true; }
+  try {
+    // Si es base64 (foto subida), subirla a ImgBB
+    if (pendingPhoto.src.startsWith('data:')) {
+      pendingPhoto.src = await uploadToImgBB(pendingPhoto.src);
+    }
+  } catch(e) {
+    console.error('Error subiendo a ImgBB:', e);
+    alert('Hubo un error subiendo la foto. Intenta de nuevo 🌸');
+    if (btn) { btn.textContent = 'Guardar ✨'; btn.disabled = false; }
+    return;
+  }
   pendingPhoto.caption = caption.trim();
   photos.unshift(pendingPhoto);
-  savePhotosLS();
+  await savePhotos();
   renderGrid();
   pendingPhoto = null;
   document.getElementById('capOverlay').classList.remove('active');
+  if (btn) { btn.textContent = 'Guardar ✨'; btn.disabled = false; }
   if (window._pendingNext) { window._pendingNext(); window._pendingNext = null; }
 }
 
 document.getElementById('capInput').addEventListener('keydown', e => { if (e.key === 'Enter') savePhoto(document.getElementById('capInput').value); });
-function deletePhoto(i) { if (confirm('¿Eliminar esta foto?')) { photos.splice(i, 1); savePhotosLS(); renderGrid(); } }
+window.deletePhoto = async function(i) { if (confirm('¿Eliminar esta foto?')) { photos.splice(i, 1); await savePhotos(); renderGrid(); } }
 
 // LIGHTBOX
-function openLB(i) { lbIndex = i; updateLB(); document.getElementById('lightbox').classList.add('active'); }
-function closeLB() { document.getElementById('lightbox').classList.remove('active'); }
-function lbNav(d) { lbIndex = (lbIndex + d + photos.length) % photos.length; updateLB(); }
+window.openLB = function(i) { lbIndex = i; updateLB(); document.getElementById('lightbox').classList.add('active'); }
+window.closeLB = function() { document.getElementById('lightbox').classList.remove('active'); }
+window.lbNav = function(d) { lbIndex = (lbIndex + d + photos.length) % photos.length; updateLB(); }
 function updateLB() { document.getElementById('lbImg').src = photos[lbIndex].src; document.getElementById('lbCaption').textContent = photos[lbIndex].caption || ''; }
 document.getElementById('lightbox').addEventListener('click', e => { if (e.target === document.getElementById('lightbox')) closeLB(); });
 document.addEventListener('keydown', e => {

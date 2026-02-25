@@ -345,7 +345,7 @@ window.previewImgFile = function() {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = e => {
-    pendingImgData = e.target.result;
+    pendingImgData = e.target.result; // base64 temporal para preview
     const preview = document.getElementById('imgPreview');
     preview.src = pendingImgData;
     preview.classList.add('visible');
@@ -353,22 +353,54 @@ window.previewImgFile = function() {
   reader.readAsDataURL(file);
 }
 
-window.guardar = function() {
+async function uploadToImgBB(base64data) {
+  const base64 = base64data.split(',')[1];
+  const formData = new FormData();
+  formData.append('image', base64);
+  const res = await fetch(`https://api.imgbb.com/1/upload?key=3dec58925d383bab2caebdbb0e2f43e0`, {
+    method: 'POST',
+    body: formData
+  });
+  const json = await res.json();
+  if (json.success) return json.data.url;
+  throw new Error('ImgBB error');
+}
+
+window.guardar = async function() {
   const name = document.getElementById('nameInput').value.trim();
   if (!name) { document.getElementById('nameInput').style.borderColor = 'var(--rose)'; document.getElementById('nameInput').focus(); return; }
   document.getElementById('nameInput').style.borderColor = '';
+
+  let imgFinal = imgMode === 'url' ? document.getElementById('imgUrlInput').value.trim() : '';
+
+  // Si hay una imagen subida (base64), subirla a ImgBB
+  if (pendingImgData && pendingImgData.startsWith('data:')) {
+    const btnG = document.querySelector('.btn-save');
+    if (btnG) { btnG.textContent = 'Subiendo imagen... ⏳'; btnG.disabled = true; }
+    try {
+      imgFinal = await uploadToImgBB(pendingImgData);
+    } catch(e) {
+      alert('Error subiendo la imagen. Intenta de nuevo 🌸');
+      if (btnG) { btnG.textContent = 'Guardar ✨'; btnG.disabled = false; }
+      return;
+    }
+    if (btnG) { btnG.textContent = 'Guardar ✨'; btnG.disabled = false; }
+  } else if (pendingImgData) {
+    imgFinal = pendingImgData;
+  }
+
   items.unshift({
     id: Date.now() + '' + Math.floor(Math.random()*1000),
     name,
     cat: document.getElementById('catInput').value,
     precio: document.getElementById('precioInput').value.trim(),
     link: document.getElementById('linkInput').value.trim(),
-    img: pendingImgData || (imgMode==='url' ? document.getElementById('imgUrlInput').value.trim() : ''),
+    img: imgFinal,
     nota: document.getElementById('notaInput').value.trim(),
     estado: 'quiero',
     fecha: new Date().toISOString()
   });
-  save(); buildCatFilters(); closeModal(); render();
+  await save(); buildCatFilters(); closeModal(); render();
 }
 
 document.getElementById('nameInput').addEventListener('keydown', e => { if (e.key === 'Enter') guardar(); });
