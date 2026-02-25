@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Música — Rincón de Lorena</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0810;--surface:#16101a;--surface2:#1e1525;--cream:#f5ede0;--muted:rgba(245,237,224,0.5);--rose:#d4789a;--deep-rose:#a0435a;--gold:#c9a84c;--soft-gold:rgba(201,168,76,0.12);--border:rgba(201,168,76,0.12);--border-rose:rgba(212,120,154,0.2);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);font-family:'Cormorant Garamond',serif;color:var(--cream);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 60% 50% at 50% 20%,rgba(100,67,160,0.1) 0%,transparent 70%);}
+.topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:rgba(13,8,16,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.topbar-logo{font-family:'Playfair Display',serif;font-style:italic;color:var(--gold);font-size:1rem;text-decoration:none;}
+.topbar-nav{display:flex;gap:2px;overflow-x:auto;}
+.nav-link{color:var(--muted);font-size:0.78rem;padding:6px 12px;border-radius:20px;text-decoration:none;transition:all 0.2s;border:1px solid transparent;white-space:nowrap;}
+.nav-link:hover{color:var(--cream);}
+.nav-link.active{color:var(--gold);border-color:rgba(201,168,76,0.25);background:var(--soft-gold);}
+.page-body{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:40px 20px 80px;}
+.page-header{margin-bottom:30px;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.page-header h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,2.6rem);}
+.page-header h1 em{color:var(--rose);font-style:italic;}
+.page-header p{color:var(--muted);font-style:italic;margin-top:6px;}
+.btn-add{background:linear-gradient(135deg,var(--deep-rose),var(--rose));color:white;border:none;padding:10px 22px;border-radius:20px;font-family:'Cormorant Garamond',serif;font-size:0.95rem;cursor:pointer;display:flex;align-items:center;gap:6px;transition:opacity 0.2s;}
+.btn-add:hover{opacity:0.85;}
+.tabs{display:flex;gap:8px;margin-bottom:24px;}
+.tab{background:none;border:1px solid var(--border);color:var(--muted);padding:8px 20px;border-radius:20px;font-family:'Cormorant Garamond',serif;font-size:0.9rem;cursor:pointer;transition:all 0.2s;}
+.tab.active{color:var(--gold);border-color:rgba(201,168,76,0.35);background:var(--soft-gold);}
+.music-list{display:flex;flex-direction:column;gap:16px;}
+.song-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;animation:fadeUp 0.4s ease forwards;opacity:0;}
+.song-header{padding:14px 18px 10px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.song-info{display:flex;align-items:center;gap:12px;}
+.song-icon{font-size:1.5rem;}
+.song-title{font-family:'Playfair Display',serif;font-size:1rem;color:var(--cream);}
+.song-sub{font-size:0.78rem;color:var(--muted);font-style:italic;margin-top:2px;}
+.song-del{background:rgba(160,67,90,0.2);color:var(--rose);border:1px solid var(--border-rose);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:0.75rem;display:flex;align-items:center;justify-content:center;transition:background 0.2s;flex-shrink:0;}
+.song-del:hover{background:rgba(160,67,90,0.45);}
+.song-embed{width:100%;border:none;display:block;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(5,2,8,0.88);backdrop-filter:blur(12px);z-index:400;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.active{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border-rose);border-radius:22px;padding:32px 28px;max-width:440px;width:100%;}
+.modal h3{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:6px;font-style:italic;}
+.modal .modal-sub{color:var(--muted);font-size:0.85rem;font-style:italic;margin-bottom:22px;}
+.modal label{display:block;font-size:0.82rem;color:var(--muted);margin-bottom:6px;margin-top:14px;}
+.modal input,.modal select{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--cream);padding:11px 14px;border-radius:12px;font-family:'Cormorant Garamond',serif;font-size:1rem;outline:none;transition:border-color 0.2s;}
+.modal input:focus,.modal select:focus{border-color:var(--border-rose);}
+.modal input::placeholder{color:var(--muted);}
+.modal select option{background:var(--surface2);}
+.modal-btns{display:flex;gap:10px;justify-content:flex-end;margin-top:22px;}
+.btn-cancel{background:none;border:1px solid var(--border);color:var(--muted);padding:10px 20px;border-radius:20px;font-family:'Cormorant Garamond',serif;font-size:0.95rem;cursor:pointer;}
+.btn-save{background:linear-gradient(135deg,var(--deep-rose),var(--rose));color:white;border:none;padding:10px 24px;border-radius:20px;font-family:'Cormorant Garamond',serif;font-size:0.95rem;cursor:pointer;}
+.hint{font-size:0.78rem;color:var(--muted);font-style:italic;margin-top:5px;}
+.empty-state{text-align:center;padding:50px 20px;color:var(--muted);}
+.empty-state .icon{font-size:3rem;margin-bottom:14px;opacity:0.4;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+@media(max-width:600px){.topbar-nav .nav-text{display:none;}.tabs{flex-wrap:wrap;}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a href="index.html" class="topbar-logo">Rincón de Lorena 🌹</a>
+  <nav class="topbar-nav">
+    <a href="biblioteca.html" class="nav-link">📚<span class="nav-text"> Libros</span></a>
+    <a href="videos.html" class="nav-link">🎬<span class="nav-text"> Videos</span></a>
+    <a href="musica.html" class="nav-link active">🎵<span class="nav-text"> Música</span></a>
+    <a href="calendario.html" class="nav-link">📅<span class="nav-text"> Agenda</span></a>
+    <a href="diario.html" class="nav-link">💭<span class="nav-text"> Diario</span></a>
+    <a href="album.html" class="nav-link">🖼️<span class="nav-text"> Álbum</span></a>
+    <a href="wishlist.html" class="nav-link">✨<span class="nav-text"> Wishlist</span></a>
+    <a href="mood.html" class="nav-link">🌙<span class="nav-text"> Mood</span></a>
+  </nav>
+</header>
+
+<div class="page-body">
+  <div class="page-header">
+    <div>
+      <h1>Tu <em>Música</em> 🎵</h1>
+      <p>Canciones y playlists para cada momento</p>
+    </div>
+    <button class="btn-add" onclick="openModal()">＋ Agregar música</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="setTab('all',this)">Todo</button>
+    <button class="tab" onclick="setTab('cancion',this)">🎶 Canciones</button>
+    <button class="tab" onclick="setTab('playlist',this)">📋 Playlists</button>
+  </div>
+
+  <div class="music-list" id="musicList"></div>
+</div>
+
+<!-- MODAL AGREGAR -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3>Agregar música 🎵</h3>
+    <p class="modal-sub">Pega el link de Spotify o YouTube</p>
+
+    <label>Tipo</label>
+    <select id="tipoSelect">
+      <option value="cancion">🎶 Canción individual</option>
+      <option value="playlist">📋 Playlist completa</option>
+    </select>
+
+    <label>Link de Spotify o YouTube</label>
+    <input type="url" id="urlInput" placeholder="https://open.spotify.com/track/... o https://youtu.be/...">
+    <p class="hint">Spotify → botón Compartir → Copiar enlace &nbsp;·&nbsp; YouTube → cualquier link del video</p>
+
+    <label>Título (opcional)</label>
+    <input type="text" id="tituloInput" placeholder="Ej: Mi canción favorita 🌹" maxlength="60">
+
+    <label>Descripción (opcional)</label>
+    <input type="text" id="descInput" placeholder="Ej: Para cuando llueve..." maxlength="80">
+
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save" onclick="guardarMusica()">Guardar ✨</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let musicItems = [];
+let currentTab = 'all';
+
+async function load() {
+  try {
+    const r = await window.storage.get('lorena_musica', true);
+    musicItems = r ? JSON.parse(r.value) : [];
+  } catch { musicItems = []; }
+  if (!musicItems.length) loadFromJSON();
+  else render();
+}
+
+async function loadFromJSON() {
+  try {
+    const r = await fetch('musica.json?' + Date.now());
+    const d = await r.json();
+    const playlists = d.playlists || [];
+    musicItems = playlists.map(p => ({
+      id: Date.now() + Math.random(),
+      tipo: 'playlist',
+      url: p.url,
+      titulo: p.titulo,
+      descripcion: p.descripcion || '',
+      icono: p.icono || '📋',
+      fecha: new Date().toISOString()
+    }));
+    if (musicItems.length) save();
+  } catch(e) {}
+  render();
+}
+
+async function save() { try { await window.storage.set('lorena_musica', JSON.stringify(musicItems), true); } catch(e) { console.error('Error guardando:', e); } }
+
+function setTab(tab, el) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  render();
+}
+
+function getEmbed(url, tipo) {
+  url = url.trim();
+  if (url.includes('spotify.com')) {
+    const match = url.match(/spotify\.com\/(track|album|playlist|episode|show)\/([a-zA-Z0-9]+)/);
+    if (match) return { src: `https://open.spotify.com/embed/${match[1]}/${match[2]}?utm_source=generator&theme=0`, height: (match[1] === 'track' || match[1] === 'episode') ? 152 : 352 };
+  }
+  if (url.includes('youtu.be/')) {
+    const id = url.split('youtu.be/')[1].split('?')[0];
+    return { src: `https://www.youtube.com/embed/${id}`, height: 215 };
+  }
+  if (url.includes('youtube.com/watch')) {
+    try { const id = new URL(url).searchParams.get('v'); if (id) return { src: `https://www.youtube.com/embed/${id}`, height: 215 }; } catch {}
+  }
+  if (url.includes('youtube.com/playlist')) {
+    try { const id = new URL(url).searchParams.get('list'); if (id) return { src: `https://www.youtube.com/embed/videoseries?list=${id}`, height: 215 }; } catch {}
+  }
+  return { src: url, height: 200 };
+}
+
+function render() {
+  const list = document.getElementById('musicList');
+  const filtered = currentTab === 'all' ? musicItems : musicItems.filter(m => m.tipo === currentTab);
+  if (!filtered.length) {
+    list.innerHTML = `<div class="empty-state"><div class="icon">🎵</div><p>${musicItems.length ? 'No hay nada en esta categoría.' : '¡Agrega tu primera canción o playlist con el botón de arriba!'}</p></div>`;
+    return;
+  }
+  list.innerHTML = filtered.map((item, i) => {
+    const embed = getEmbed(item.url, item.tipo);
+    return `<div class="song-card" style="animation-delay:${i*0.07}s">
+      <div class="song-header">
+        <div class="song-info">
+          <span class="song-icon">${item.icono || (item.tipo === 'playlist' ? '📋' : '🎶')}</span>
+          <div>
+            <div class="song-title">${item.titulo || 'Sin título'}</div>
+            ${item.descripcion ? `<div class="song-sub">${item.descripcion}</div>` : ''}
+          </div>
+        </div>
+        <button class="song-del" onclick="eliminar('${item.id}')" title="Eliminar">✕</button>
+      </div>
+      <iframe class="song-embed" src="${embed.src}" height="${embed.height}"
+        allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    </div>`;
+  }).join('');
+}
+
+function eliminar(id) {
+  if (!confirm('¿Eliminar esta canción/playlist?')) return;
+  musicItems = musicItems.filter(m => String(m.id) !== String(id));
+  save(); render();
+}
+
+function openModal() {
+  document.getElementById('modalOverlay').classList.add('active');
+  setTimeout(() => document.getElementById('urlInput').focus(), 100);
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('active');
+  ['urlInput','tituloInput','descInput'].forEach(id => document.getElementById(id).value = '');
+}
+
+function guardarMusica() {
+  const url = document.getElementById('urlInput').value.trim();
+  if (!url) { document.getElementById('urlInput').style.borderColor='var(--rose)'; document.getElementById('urlInput').focus(); return; }
+  document.getElementById('urlInput').style.borderColor='';
+  const tipo = url.includes('playlist') ? 'playlist' : document.getElementById('tipoSelect').value;
+  const titulo = document.getElementById('tituloInput').value.trim();
+  const descripcion = document.getElementById('descInput').value.trim();
+
+  musicItems.unshift({
+    id: Date.now() + Math.random(),
+    tipo,
+    url,
+    titulo: titulo || (tipo === 'playlist' ? 'Nueva playlist' : 'Nueva canción'),
+    descripcion,
+    icono: tipo === 'playlist' ? '📋' : '🎶',
+    fecha: new Date().toISOString()
+  });
+  save();
+  closeModal();
+  currentTab = 'all';
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i===0));
+  render();
+}
+
+document.getElementById('urlInput').addEventListener('keydown', e => { if (e.key === 'Enter') guardarMusica(); });
+document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === document.getElementById('modalOverlay')) closeModal(); });
+
+load();
+</script>
+</body>
+</html>
