@@ -1,0 +1,11 @@
+{
+  "descripcion": "Música para cada momento del día 🎵",
+  "playlists": [
+    {
+      "titulo": "Tu playlist favorita",
+      "descripcion": "Reemplaza esta URL con un link de Spotify o YouTube",
+      "icono": "🌹",
+      "url": "https://open.spotify.com/playlist/5uIC9qWT4NOhML4NpQMPhn?si=758794d338c34e14"
+    }
+  ]
+}

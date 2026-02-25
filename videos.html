@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Videos — Rincón de Lorena</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0810;--surface:#16101a;--surface2:#1e1525;--cream:#f5ede0;--muted:rgba(245,237,224,0.5);--rose:#d4789a;--deep-rose:#a0435a;--gold:#c9a84c;--soft-gold:rgba(201,168,76,0.12);--border:rgba(201,168,76,0.12);--border-rose:rgba(212,120,154,0.2);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);font-family:'Cormorant Garamond',serif;color:var(--cream);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 60% 50% at 80% 20%,rgba(160,67,90,0.12) 0%,transparent 70%);}
+.topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:rgba(13,8,16,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.topbar-logo{font-family:'Playfair Display',serif;font-style:italic;color:var(--gold);font-size:1rem;text-decoration:none;}
+.topbar-nav{display:flex;gap:2px;overflow-x:auto;}
+.nav-link{color:var(--muted);font-size:0.78rem;padding:6px 12px;border-radius:20px;text-decoration:none;transition:all 0.2s;border:1px solid transparent;white-space:nowrap;}
+.nav-link:hover{color:var(--cream);}
+.nav-link.active{color:var(--gold);border-color:rgba(201,168,76,0.25);background:var(--soft-gold);}
+.page-body{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:40px 20px 80px;}
+.page-header{margin-bottom:36px;}
+.page-header h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,2.6rem);}
+.page-header h1 em{color:var(--rose);font-style:italic;}
+.page-header p{color:var(--muted);font-style:italic;margin-top:6px;border-left:2px solid var(--gold);padding-left:12px;}
+.videos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:20px;}
+.video-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:all 0.28s;cursor:pointer;opacity:0;animation:fadeUp 0.5s ease forwards;}
+.video-card:hover{transform:translateY(-5px);border-color:var(--border-rose);box-shadow:0 14px 36px rgba(0,0,0,0.35);}
+.video-thumb{width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,#1a0a10,#2d1020);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.video-thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.video-play{position:relative;z-index:1;width:46px;height:46px;background:rgba(160,67,90,0.88);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;backdrop-filter:blur(4px);transition:all 0.2s;}
+.video-card:hover .video-play{transform:scale(1.12);background:rgba(212,120,154,0.95);}
+.video-info{padding:16px;}
+.video-info h3{font-family:'Playfair Display',serif;font-size:0.92rem;color:var(--cream);line-height:1.3;}
+.video-info p{font-size:0.78rem;color:var(--muted);font-style:italic;margin-top:5px;}
+.video-tag{display:inline-block;background:rgba(212,120,154,0.12);color:var(--rose);font-size:0.65rem;padding:3px 10px;border-radius:20px;margin-top:8px;}
+.video-card:nth-child(1){animation-delay:0.1s;}.video-card:nth-child(2){animation-delay:0.2s;}.video-card:nth-child(3){animation-delay:0.3s;}.video-card:nth-child(4){animation-delay:0.4s;}.video-card:nth-child(5){animation-delay:0.5s;}.video-card:nth-child(6){animation-delay:0.6s;}
+/* VIDEO MODAL */
+.vmodal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.94);z-index:300;align-items:center;justify-content:center;padding:16px;}
+.vmodal-overlay.active{display:flex;}
+.vmodal-inner{width:100%;max-width:860px;position:relative;}
+.vmodal-close{position:absolute;top:-38px;right:0;background:none;border:none;color:rgba(255,255,255,0.7);font-size:1.4rem;cursor:pointer;}
+.vmodal-close:hover{color:white;}
+.video-embed{width:100%;aspect-ratio:16/9;border:none;border-radius:12px;background:#000;}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
+.empty-state .icon{font-size:3rem;margin-bottom:14px;opacity:0.4;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+@media(max-width:600px){.topbar-nav .nav-text{display:none;}.videos-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a href="index.html" class="topbar-logo">Rincón de Lorena 🌹</a>
+  <nav class="topbar-nav">
+    <a href="biblioteca.html" class="nav-link">📚<span class="nav-text"> Libros</span></a>
+    <a href="videos.html" class="nav-link active">🎬<span class="nav-text"> Videos</span></a>
+    <a href="musica.html" class="nav-link">🎵<span class="nav-text"> Música</span></a>
+    <a href="calendario.html" class="nav-link">📅<span class="nav-text"> Agenda</span></a>
+    <a href="diario.html" class="nav-link">💭<span class="nav-text"> Diario</span></a>
+    <a href="album.html" class="nav-link">🖼️<span class="nav-text"> Álbum</span></a>
+    <a href="wishlist.html" class="nav-link">✨<span class="nav-text"> Wishlist</span></a>
+    <a href="mood.html" class="nav-link">🌙<span class="nav-text"> Mood</span></a>
+  </nav>
+</header>
+<div class="page-body">
+  <div class="page-header">
+    <h1>Tus <em>Videos</em> 🎬</h1>
+    <p id="videosDesc">Cargando videos...</p>
+  </div>
+  <div class="videos-grid" id="videosGrid"><div class="empty-state"><div class="icon">🎬</div><p>Cargando...</p></div></div>
+</div>
+<div class="vmodal-overlay" id="vModal">
+  <div class="vmodal-inner">
+    <button class="vmodal-close" onclick="closeV()">✕ Cerrar</button>
+    <iframe class="video-embed" id="vFrame" src="" allowfullscreen allow="autoplay"></iframe>
+  </div>
+</div>
+<script>
+async function load(){
+  try{
+    const r=await fetch('videos.json?'+Date.now());
+    const d=await r.json();
+    const videos=d.videos||[];
+    document.getElementById('videosDesc').textContent=d.descripcion||`${videos.length} video${videos.length!==1?'s':''} guardados para ti`;
+    window._videos=videos;
+    if(!videos.length){document.getElementById('videosGrid').innerHTML='<div class="empty-state"><div class="icon">🎬</div><p>Pronto habrá videos aquí para ti...</p></div>';return;}
+    document.getElementById('videosGrid').innerHTML=videos.map((v,i)=>`
+      <div class="video-card" onclick="openV(${i})">
+        <div class="video-thumb">
+          ${v.thumbnail?`<img src="${v.thumbnail}" alt="${v.titulo}">`:''}
+          <div class="video-play">▶</div>
+        </div>
+        <div class="video-info">
+          <h3>${v.titulo}</h3>
+          <p>${v.descripcion||''}</p>
+          <span class="video-tag">${v.tipo||'Video'}</span>
+        </div>
+      </div>`).join('');
+  }catch(e){document.getElementById('videosGrid').innerHTML='<div class="empty-state"><div class="icon">🎬</div><p>No se pudieron cargar los videos.</p></div>';}
+}
+function openV(i){
+  const v=window._videos[i];
+  let url=v.url;
+  if(url.includes('youtube.com/watch')){const id=new URL(url).searchParams.get('v');url=`https://www.youtube.com/embed/${id}?autoplay=1`;}
+  else if(url.includes('youtu.be/')){const id=url.split('youtu.be/')[1].split('?')[0];url=`https://www.youtube.com/embed/${id}?autoplay=1`;}
+  else if(url.includes('tiktok.com')){window.open(url,'_blank');return;}
+  document.getElementById('vFrame').src=url;
+  document.getElementById('vModal').classList.add('active');
+}
+function closeV(){document.getElementById('vModal').classList.remove('active');document.getElementById('vFrame').src='';}
+document.getElementById('vModal').addEventListener('click',e=>{if(e.target===document.getElementById('vModal'))closeV();});
+load();
+</script>
+</body>
+</html>

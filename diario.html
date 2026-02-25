@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diario — Rincón de Lorena</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0810;--surface:#16101a;--surface2:#1e1525;--cream:#f5ede0;--muted:rgba(245,237,224,0.5);--rose:#d4789a;--deep-rose:#a0435a;--gold:#c9a84c;--soft-gold:rgba(201,168,76,0.12);--border:rgba(201,168,76,0.12);--border-rose:rgba(212,120,154,0.2);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);font-family:'Cormorant Garamond',serif;color:var(--cream);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 50% 60% at 70% 30%,rgba(90,60,160,0.1) 0%,transparent 70%);}
+.topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:rgba(13,8,16,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.topbar-logo{font-family:'Playfair Display',serif;font-style:italic;color:var(--gold);font-size:1rem;text-decoration:none;}
+.topbar-nav{display:flex;gap:2px;overflow-x:auto;}
+.nav-link{color:var(--muted);font-size:0.78rem;padding:6px 12px;border-radius:20px;text-decoration:none;transition:all 0.2s;border:1px solid transparent;white-space:nowrap;}
+.nav-link:hover{color:var(--cream);}
+.nav-link.active{color:var(--gold);border-color:rgba(201,168,76,0.25);background:var(--soft-gold);}
+.page-body{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:40px 20px 80px;}
+/* LOCK SCREEN */
+.lock-screen{text-align:center;padding:80px 20px;display:flex;flex-direction:column;align-items:center;gap:20px;}
+.lock-icon{font-size:4rem;animation:float 3s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+.lock-screen h2{font-family:'Playfair Display',serif;font-size:1.8rem;font-style:italic;}
+.lock-screen p{color:var(--muted);font-style:italic;}
+.pin-input{display:flex;gap:10px;justify-content:center;margin-top:8px;}
+.pin-dot{width:52px;height:52px;background:var(--surface);border:1px solid var(--border);border-radius:14px;font-size:1.5rem;text-align:center;color:var(--cream);font-family:'Cormorant Garamond',serif;outline:none;transition:border-color 0.2s;}
+.pin-dot:focus{border-color:var(--rose);}
+.btn-unlock{background:linear-gradient(135deg,var(--deep-rose),var(--rose));color:white;border:none;padding:13px 36px;border-radius:30px;font-family:'Cormorant Garamond',serif;font-size:1.05rem;cursor:pointer;transition:all 0.25s;}
+.btn-unlock:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(160,67,90,0.35);}
+.lock-error{color:var(--rose);font-style:italic;font-size:0.9rem;display:none;}
+.lock-hint{font-size:0.75rem;color:var(--muted);font-style:italic;}
+/* DIARY */
+.diary-view{display:none;}
+.diary-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;}
+.diary-header h1{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,4vw,2.2rem);}
+.diary-header h1 em{color:var(--rose);font-style:italic;}
+.btn-lock{background:none;border:1px solid var(--border);color:var(--muted);padding:8px 16px;border-radius:20px;font-family:'Cormorant Garamond',serif;font-size:0.82rem;cursor:pointer;transition:all 0.2s;}
+.btn-lock:hover{color:var(--rose);border-color:var(--border-rose);}
+/* NEW ENTRY */
+.new-entry{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px;margin-bottom:28px;}
+.entry-date{font-size:0.72rem;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;}
+.entry-title-input{width:100%;background:none;border:none;color:var(--cream);font-family:'Playfair Display',serif;font-size:1.2rem;font-style:italic;outline:none;margin-bottom:10px;}
+.entry-title-input::placeholder{color:var(--muted);}
+.entry-body-input{width:100%;background:none;border:none;color:rgba(245,237,224,0.85);font-family:'Cormorant Garamond',serif;font-size:1rem;line-height:1.8;outline:none;resize:none;min-height:100px;}
+.entry-body-input::placeholder{color:var(--muted);}
+.entry-actions{display:flex;justify-content:flex-end;margin-top:14px;border-top:1px solid var(--border);padding-top:14px;}
+.btn-save{background:linear-gradient(135deg,var(--deep-rose),var(--rose));color:white;border:none;padding:10px 24px;border-radius:20px;font-family:'Cormorant Garamond',serif;font-size:0.95rem;cursor:pointer;transition:all 0.2s;}
+.btn-save:hover{transform:translateY(-1px);}
+/* ENTRIES LIST */
+.entries-list{display:flex;flex-direction:column;gap:16px;}
+.entry-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;position:relative;transition:border-color 0.2s;}
+.entry-card:hover{border-color:var(--border-rose);}
+.entry-card-date{font-size:0.7rem;color:var(--gold);font-style:italic;margin-bottom:8px;}
+.entry-card-title{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--cream);margin-bottom:8px;}
+.entry-card-preview{font-size:0.9rem;color:var(--muted);line-height:1.6;}
+.entry-card-del{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;transition:color 0.2s;}
+.entry-card-del:hover{color:var(--rose);}
+.empty-diary{text-align:center;padding:40px;color:var(--muted);font-style:italic;}
+@media(max-width:600px){.topbar-nav .nav-text{display:none;}.pin-dot{width:44px;height:44px;font-size:1.3rem;}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a href="index.html" class="topbar-logo">Rincón de Lorena 🌹</a>
+  <nav class="topbar-nav">
+    <a href="biblioteca.html" class="nav-link">📚<span class="nav-text"> Libros</span></a>
+    <a href="videos.html" class="nav-link">🎬<span class="nav-text"> Videos</span></a>
+    <a href="musica.html" class="nav-link">🎵<span class="nav-text"> Música</span></a>
+    <a href="calendario.html" class="nav-link">📅<span class="nav-text"> Agenda</span></a>
+    <a href="diario.html" class="nav-link active">💭<span class="nav-text"> Diario</span></a>
+    <a href="album.html" class="nav-link">🖼️<span class="nav-text"> Álbum</span></a>
+    <a href="wishlist.html" class="nav-link">✨<span class="nav-text"> Wishlist</span></a>
+    <a href="mood.html" class="nav-link">🌙<span class="nav-text"> Mood</span></a>
+  </nav>
+</header>
+<div class="page-body">
+  <!-- LOCK -->
+  <div class="lock-screen" id="lockScreen">
+    <div class="lock-icon">🔐</div>
+    <h2>Diario <em>Privado</em></h2>
+    <p>Este espacio es solo tuyo 🌹</p>
+    <div class="pin-input">
+      <input type="password" maxlength="1" class="pin-dot" id="p0" oninput="nextPin(0)" inputmode="numeric">
+      <input type="password" maxlength="1" class="pin-dot" id="p1" oninput="nextPin(1)" inputmode="numeric">
+      <input type="password" maxlength="1" class="pin-dot" id="p2" oninput="nextPin(2)" inputmode="numeric">
+      <input type="password" maxlength="1" class="pin-dot" id="p3" oninput="nextPin(3)" inputmode="numeric">
+    </div>
+    <p class="lock-error" id="lockError">PIN incorrecto, intenta de nuevo 🌸</p>
+    <button class="btn-unlock" onclick="tryUnlock()">Entrar 🌹</button>
+    <p class="lock-hint">PIN por defecto: 1234 — cámbialo abajo después de entrar</p>
+  </div>
+  <!-- DIARY -->
+  <div class="diary-view" id="diaryView">
+    <div class="diary-header">
+      <h1>Mi <em>Diario</em> 💭</h1>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn-lock" onclick="changePIN()">🔑 Cambiar PIN</button>
+        <button class="btn-lock" onclick="lockDiary()">🔒 Cerrar</button>
+      </div>
+    </div>
+    <!-- NEW ENTRY -->
+    <div class="new-entry">
+      <div class="entry-date" id="newEntryDate"></div>
+      <input type="text" class="entry-title-input" id="entryTitle" placeholder="Título de tu entrada...">
+      <textarea class="entry-body-input" id="entryBody" placeholder="¿Cómo te sientes hoy? Escribe lo que quieras..." rows="5"></textarea>
+      <div class="entry-actions"><button class="btn-save" onclick="saveEntry()">Guardar entrada ✨</button></div>
+    </div>
+    <div class="entries-list" id="entriesList"></div>
+  </div>
+</div>
+<script>
+const DEFAULT_PIN='1234';
+function getPin(){return localStorage.getItem('lorena_diary_pin')||DEFAULT_PIN;}
+function getEntries(){try{return JSON.parse(localStorage.getItem('lorena_diary_entries')||'[]');}catch{return [];}}
+function saveEntries(e){localStorage.setItem('lorena_diary_entries',JSON.stringify(e));}
+function nextPin(i){const val=document.getElementById(`p${i}`).value;if(val&&i<3)document.getElementById(`p${i+1}`).focus();}
+function tryUnlock(){
+  const pin=[0,1,2,3].map(i=>document.getElementById(`p${i}`).value).join('');
+  if(pin===getPin()){unlock();}
+  else{document.getElementById('lockError').style.display='block';[0,1,2,3].forEach(i=>{document.getElementById(`p${i}`).value='';});document.getElementById('p0').focus();}
+}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('lockScreen').style.display!=='none')tryUnlock();});
+function unlock(){
+  document.getElementById('lockScreen').style.display='none';
+  document.getElementById('diaryView').style.display='block';
+  const now=new Date();
+  document.getElementById('newEntryDate').textContent=now.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  renderEntries();
+}
+function lockDiary(){document.getElementById('lockScreen').style.display='flex';document.getElementById('diaryView').style.display='none';[0,1,2,3].forEach(i=>document.getElementById(`p${i}`).value='');document.getElementById('lockError').style.display='none';}
+function changePIN(){const np=prompt('Nuevo PIN (4 dígitos):');if(np&&/^\d{4}$/.test(np)){localStorage.setItem('lorena_diary_pin',np);alert('PIN actualizado 🌹');}else if(np){alert('El PIN debe ser exactamente 4 números.');}}
+function saveEntry(){
+  const title=document.getElementById('entryTitle').value.trim();
+  const body=document.getElementById('entryBody').value.trim();
+  if(!body)return;
+  const entries=getEntries();
+  entries.unshift({title:title||'Sin título',body,date:new Date().toISOString()});
+  saveEntries(entries);
+  document.getElementById('entryTitle').value='';
+  document.getElementById('entryBody').value='';
+  renderEntries();
+}
+function deleteEntry(i){if(confirm('¿Eliminar esta entrada?')){const entries=getEntries();entries.splice(i,1);saveEntries(entries);renderEntries();}}
+function renderEntries(){
+  const entries=getEntries();
+  const list=document.getElementById('entriesList');
+  if(!entries.length){list.innerHTML='<div class="empty-diary">Aún no hay entradas. ¡Empieza a escribir! ✨</div>';return;}
+  list.innerHTML=entries.map((e,i)=>{
+    const d=new Date(e.date);
+    const dateStr=d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    const preview=e.body.substring(0,120)+(e.body.length>120?'...':'');
+    return `<div class="entry-card">
+      <p class="entry-card-date">📅 ${dateStr}</p>
+      <h3 class="entry-card-title">${e.title}</h3>
+      <p class="entry-card-preview">${preview}</p>
+      <button class="entry-card-del" onclick="deleteEntry(${i})">✕</button>
+    </div>`;
+  }).join('');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mood — Rincón de Lorena</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0810;--surface:#16101a;--surface2:#1e1525;--cream:#f5ede0;
+  --muted:rgba(245,237,224,0.5);--rose:#d4789a;--deep-rose:#a0435a;
+  --gold:#c9a84c;--soft-gold:rgba(201,168,76,0.12);
+  --border:rgba(201,168,76,0.12);--border-rose:rgba(212,120,154,0.2);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);font-family:'Cormorant Garamond',serif;color:var(--cream);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 60% 50% at 30% 20%,rgba(100,67,160,0.09) 0%,transparent 65%),
+             radial-gradient(ellipse 50% 40% at 80% 80%,rgba(160,67,90,0.07) 0%,transparent 60%);}
+
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:rgba(13,8,16,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.topbar-logo{font-family:'Playfair Display',serif;font-style:italic;color:var(--gold);font-size:1rem;text-decoration:none;}
+.topbar-nav{display:flex;gap:2px;overflow-x:auto;}
+.nav-link{color:var(--muted);font-size:0.78rem;padding:6px 12px;border-radius:20px;text-decoration:none;transition:all 0.2s;border:1px solid transparent;white-space:nowrap;}
+.nav-link:hover{color:var(--cream);}
+.nav-link.active{color:var(--gold);border-color:rgba(201,168,76,0.25);background:var(--soft-gold);}
+
+/* PAGE */
+.page-body{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:40px 20px 80px;}
+.page-header{margin-bottom:32px;}
+.page-header h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,2.6rem);}
+.page-header h1 em{color:var(--rose);font-style:italic;}
+.page-header p{color:var(--muted);font-style:italic;margin-top:6px;}
+
+/* TODAY CARD */
+.today-card{background:var(--surface);border:1px solid var(--border-rose);border-radius:22px;padding:26px 28px;margin-bottom:28px;animation:fadeUp 0.5s ease forwards;}
+.today-label{font-size:0.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;}
+.today-date{font-family:'Playfair Display',serif;font-size:1.15rem;margin-bottom:20px;color:var(--cream);}
+.today-date span{color:var(--gold);font-style:italic;}
+
+/* MOOD PICKER */
+.mood-picker{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;}
+.mood-opt{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:10px 12px;border-radius:16px;border:2px solid transparent;transition:all 0.2s;background:var(--surface2);}
+.mood-opt:hover{border-color:var(--border-rose);transform:translateY(-2px);}
+.mood-opt.selected{border-color:var(--rose);background:rgba(212,120,154,0.1);}
+.mood-emoji{font-size:1.8rem;line-height:1;}
+.mood-label{font-size:0.7rem;color:var(--muted);white-space:nowrap;}
+.mood-opt.selected .mood-label{color:var(--rose);}
+
+/* NOTE INPUT */
+.note-row{display:flex;gap:10px;align-items:flex-start;}
+.note-input{flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--cream);padding:11px 14px;border-radius:14px;font-family:'Cormorant Garamond',serif;font-size:1rem;outline:none;transition:border-color 0.2s;resize:none;}
+.note-input:focus{border-color:var(--border-rose);}
+.note-input::placeholder{color:var(--muted);}
+.btn-save-mood{background:linear-gradient(135deg,var(--deep-rose),var(--rose));color:white;border:none;padding:11px 22px;border-radius:14px;font-family:'Cormorant Garamond',serif;font-size:0.95rem;cursor:pointer;white-space:nowrap;transition:opacity 0.2s;}
+.btn-save-mood:hover{opacity:0.85;}
+
+/* ALREADY LOGGED */
+.logged-today{display:none;align-items:center;gap:14px;padding:14px 18px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.15);border-radius:16px;margin-top:16px;}
+.logged-today.visible{display:flex;}
+.logged-emoji{font-size:2rem;}
+.logged-text{flex:1;}
+.logged-text strong{font-family:'Playfair Display',serif;font-size:1rem;color:var(--gold);}
+.logged-text p{font-size:0.85rem;color:var(--muted);font-style:italic;margin-top:2px;}
+.btn-edit{background:none;border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:12px;font-family:'Cormorant Garamond',serif;font-size:0.82rem;cursor:pointer;transition:all 0.2s;}
+.btn-edit:hover{color:var(--cream);}
+
+/* CALENDAR SECTION */
+.cal-section{background:var(--surface);border:1px solid var(--border);border-radius:22px;padding:26px 28px;animation:fadeUp 0.5s 0.1s ease forwards;opacity:0;}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
+.cal-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-style:italic;}
+.cal-nav{display:flex;gap:6px;}
+.cal-nav-btn{background:none;border:1px solid var(--border);color:var(--muted);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;transition:all 0.2s;display:flex;align-items:center;justify-content:center;}
+.cal-nav-btn:hover{color:var(--cream);border-color:rgba(201,168,76,0.3);}
+
+/* WEEKDAY HEADERS */
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px;}
+.cal-wd{text-align:center;font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;padding:4px 0;}
+
+/* DAYS GRID */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-day{aspect-ratio:1;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;border:1px solid transparent;position:relative;}
+.cal-day.empty{cursor:default;opacity:0;}
+.cal-day.today-day{border-color:rgba(201,168,76,0.4);}
+.cal-day:not(.empty):not(.has-mood):hover{background:var(--surface2);}
+.cal-day-num{font-size:0.75rem;color:var(--muted);line-height:1;}
+.cal-day.today-day .cal-day-num{color:var(--gold);}
+.cal-day-emoji{font-size:1.1rem;line-height:1;}
+.cal-day.has-mood{background:var(--surface2);}
+.cal-day.has-mood:hover{transform:scale(1.08);}
+
+/* MOOD DOT for days without emoji space */
+.cal-day-dot{width:6px;height:6px;border-radius:50%;margin-top:2px;}
+
+/* LEGEND */
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:0.75rem;color:var(--muted);}
+.legend-emoji{font-size:0.95rem;}
+
+/* DETAIL TOOLTIP */
+.day-detail{display:none;position:fixed;background:var(--surface);border:1px solid var(--border-rose);border-radius:14px;padding:12px 16px;z-index:200;pointer-events:none;max-width:200px;box-shadow:0 8px 32px rgba(0,0,0,0.5);}
+.day-detail.visible{display:block;}
+.day-detail-date{font-size:0.72rem;color:var(--muted);margin-bottom:4px;}
+.day-detail-mood{font-size:1.4rem;margin-bottom:4px;}
+.day-detail-label{font-family:'Playfair Display',serif;font-size:0.9rem;color:var(--rose);}
+.day-detail-note{font-size:0.8rem;color:var(--muted);font-style:italic;margin-top:4px;}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:20px;}
+.stat-card{background:var(--surface2);border-radius:14px;padding:14px;text-align:center;}
+.stat-emoji{font-size:1.6rem;margin-bottom:4px;}
+.stat-count{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--gold);}
+.stat-label{font-size:0.72rem;color:var(--muted);margin-top:2px;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+@media(max-width:520px){.topbar-nav .nav-text{display:none;}.mood-picker{gap:6px;}.mood-opt{padding:8px;}.mood-emoji{font-size:1.5rem;}.cal-day-emoji{font-size:0.9rem;}.note-row{flex-direction:column;}.btn-save-mood{width:100%;}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a href="index.html" class="topbar-logo">Rincón de Lorena 🌹</a>
+  <nav class="topbar-nav">
+    <a href="biblioteca.html" class="nav-link">📚<span class="nav-text"> Libros</span></a>
+    <a href="videos.html" class="nav-link">🎬<span class="nav-text"> Videos</span></a>
+    <a href="musica.html" class="nav-link">🎵<span class="nav-text"> Música</span></a>
+    <a href="calendario.html" class="nav-link">📅<span class="nav-text"> Agenda</span></a>
+    <a href="diario.html" class="nav-link">💭<span class="nav-text"> Diario</span></a>
+    <a href="album.html" class="nav-link">🖼️<span class="nav-text"> Álbum</span></a>
+    <a href="wishlist.html" class="nav-link">✨<span class="nav-text"> Wishlist</span></a>
+    <a href="mood.html" class="nav-link active">🌙<span class="nav-text"> Mood</span></a>
+  </nav>
+</header>
+
+<div class="page-body">
+  <div class="page-header">
+    <h1>Tu <em>Mood</em> 🌙</h1>
+    <p>¿Cómo te sientes hoy?</p>
+  </div>
+
+  <!-- HOY -->
+  <div class="today-card" id="todayCard">
+    <div class="today-label">Hoy</div>
+    <div class="today-date" id="todayDateLabel"></div>
+
+    <div class="mood-picker" id="moodPicker"></div>
+
+    <div class="note-row">
+      <textarea class="note-input" id="noteInput" placeholder="Escribe algo sobre tu día... (opcional)" rows="2" maxlength="150"></textarea>
+      <button class="btn-save-mood" onclick="guardarHoy()">Guardar 🌙</button>
+    </div>
+
+    <!-- Si ya guardó hoy -->
+    <div class="logged-today" id="loggedToday">
+      <span class="logged-emoji" id="loggedEmoji"></span>
+      <div class="logged-text">
+        <strong id="loggedLabel"></strong>
+        <p id="loggedNote"></p>
+      </div>
+      <button class="btn-edit" onclick="editarHoy()">Editar</button>
+    </div>
+  </div>
+
+  <!-- CALENDARIO -->
+  <div class="cal-section">
+    <div class="cal-header">
+      <span class="cal-title" id="calTitle"></span>
+      <div class="cal-nav">
+        <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
+        <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
+      </div>
+    </div>
+    <div class="cal-weekdays">
+      <div class="cal-wd">Dom</div><div class="cal-wd">Lun</div><div class="cal-wd">Mar</div>
+      <div class="cal-wd">Mié</div><div class="cal-wd">Jue</div><div class="cal-wd">Vie</div>
+      <div class="cal-wd">Sáb</div>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="stats-row" id="statsRow"></div>
+    <div class="legend" id="legend"></div>
+  </div>
+</div>
+
+<!-- DETAIL TOOLTIP -->
+<div class="day-detail" id="dayDetail">
+  <div class="day-detail-date" id="ddDate"></div>
+  <div class="day-detail-mood" id="ddEmoji"></div>
+  <div class="day-detail-label" id="ddLabel"></div>
+  <div class="day-detail-note" id="ddNote"></div>
+</div>
+
+<script>
+const MOODS = [
+  { key:'radiante',  emoji:'🌟', label:'Radiante',  color:'rgba(255,220,80,0.25)' },
+  { key:'feliz',     emoji:'🌸', label:'Feliz',     color:'rgba(212,120,154,0.25)' },
+  { key:'enamorada', emoji:'🥰', label:'Enamorada', color:'rgba(255,100,130,0.25)' },
+  { key:'tranquila', emoji:'🌿', label:'Tranquila', color:'rgba(80,180,120,0.25)' },
+  { key:'pensativa', emoji:'🌙', label:'Pensativa', color:'rgba(140,100,200,0.25)' },
+  { key:'ansiosa',   emoji:'🌊', label:'Ansiosa',   color:'rgba(80,140,220,0.25)' },
+  { key:'cansada',   emoji:'🍂', label:'Cansada',   color:'rgba(180,130,80,0.25)' },
+  { key:'triste',    emoji:'🌧️', label:'Triste',    color:'rgba(100,120,180,0.25)' },
+];
+
+const MONTHS_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const DAYS_ES = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+
+let data = {}; // { 'YYYY-MM-DD': { mood, note } }
+let selectedMood = '';
+let viewYear, viewMonth;
+let todayKey;
+
+function toKey(y, m, d) { return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
+
+function load() {
+  try { data = JSON.parse(localStorage.getItem('lorena_mood') || '{}'); } catch { data = {}; }
+  const now = new Date();
+  viewYear = now.getFullYear();
+  viewMonth = now.getMonth();
+  todayKey = toKey(now.getFullYear(), now.getMonth(), now.getDate());
+
+  // Today label
+  const dayName = DAYS_ES[now.getDay()];
+  document.getElementById('todayDateLabel').innerHTML =
+    `<span>${dayName.charAt(0).toUpperCase()+dayName.slice(1)}</span>, ${now.getDate()} de ${MONTHS_ES[now.getMonth()].toLowerCase()} ${now.getFullYear()}`;
+
+  buildMoodPicker();
+  checkTodayLogged();
+  renderCal();
+}
+
+function buildMoodPicker() {
+  document.getElementById('moodPicker').innerHTML = MOODS.map(m =>
+    `<div class="mood-opt" id="opt-${m.key}" onclick="selectMood('${m.key}')">
+       <span class="mood-emoji">${m.emoji}</span>
+       <span class="mood-label">${m.label}</span>
+     </div>`).join('');
+}
+
+function selectMood(key) {
+  selectedMood = key;
+  document.querySelectorAll('.mood-opt').forEach(el => el.classList.remove('selected'));
+  document.getElementById('opt-' + key)?.classList.add('selected');
+}
+
+function checkTodayLogged() {
+  const entry = data[todayKey];
+  const pickerArea = document.getElementById('moodPicker');
+  const noteRow = document.querySelector('.note-row');
+  const loggedDiv = document.getElementById('loggedToday');
+
+  if (entry) {
+    const m = MOODS.find(x => x.key === entry.mood);
+    document.getElementById('loggedEmoji').textContent = m?.emoji || '🌸';
+    document.getElementById('loggedLabel').textContent = m?.label || entry.mood;
+    document.getElementById('loggedNote').textContent = entry.note || 'Sin nota';
+    loggedDiv.classList.add('visible');
+    pickerArea.style.opacity = '0.35';
+    pickerArea.style.pointerEvents = 'none';
+    noteRow.style.opacity = '0.35';
+    noteRow.style.pointerEvents = 'none';
+    if (m) selectMood(m.key);
+  } else {
+    loggedDiv.classList.remove('visible');
+    pickerArea.style.opacity = '1';
+    pickerArea.style.pointerEvents = '';
+    noteRow.style.opacity = '1';
+    noteRow.style.pointerEvents = '';
+  }
+}
+
+function guardarHoy() {
+  if (!selectedMood) {
+    document.getElementById('moodPicker').style.animation = 'none';
+    document.getElementById('moodPicker').offsetHeight;
+    document.getElementById('moodPicker').style.animation = '';
+    alert('Elige cómo te sientes primero 🌸');
+    return;
+  }
+  data[todayKey] = { mood: selectedMood, note: document.getElementById('noteInput').value.trim() };
+  save();
+  checkTodayLogged();
+  renderCal();
+}
+
+function editarHoy() {
+  delete data[todayKey];
+  save();
+  selectedMood = '';
+  document.querySelectorAll('.mood-opt').forEach(el => el.classList.remove('selected'));
+  document.getElementById('noteInput').value = '';
+  checkTodayLogged();
+}
+
+function save() { localStorage.setItem('lorena_mood', JSON.stringify(data)); }
+
+// CALENDAR
+function changeMonth(d) {
+  viewMonth += d;
+  if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+  if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+  renderCal();
+}
+
+function renderCal() {
+  document.getElementById('calTitle').textContent = `${MONTHS_ES[viewMonth]} ${viewYear}`;
+  const grid = document.getElementById('calGrid');
+  const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const now = new Date();
+  const isCurrentMonth = viewYear === now.getFullYear() && viewMonth === now.getMonth();
+
+  let html = '';
+  for (let i = 0; i < firstDay; i++) html += `<div class="cal-day empty"></div>`;
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const key = toKey(viewYear, viewMonth, d);
+    const entry = data[key];
+    const mood = entry ? MOODS.find(m => m.key === entry.mood) : null;
+    const isToday = isCurrentMonth && d === now.getDate();
+    const bgStyle = mood ? `background:${mood.color};` : '';
+
+    html += `<div class="cal-day${mood?' has-mood':''}${isToday?' today-day':''}"
+      style="${bgStyle}"
+      onmouseenter="showDetail(event,'${key}')"
+      onmouseleave="hideDetail()"
+      onclick="clickDay('${key}')">
+      <span class="cal-day-num">${d}</span>
+      ${mood ? `<span class="cal-day-emoji">${mood.emoji}</span>` : ''}
+    </div>`;
+  }
+  grid.innerHTML = html;
+
+  renderStats();
+  renderLegend();
+}
+
+function renderStats() {
+  const monthData = Object.entries(data).filter(([k]) => k.startsWith(`${viewYear}-${String(viewMonth+1).padStart(2,'0')}`));
+  if (!monthData.length) { document.getElementById('statsRow').innerHTML = ''; return; }
+  const counts = {};
+  monthData.forEach(([,v]) => { counts[v.mood] = (counts[v.mood]||0)+1; });
+  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('statsRow').innerHTML = sorted.map(([key, count]) => {
+    const m = MOODS.find(x => x.key === key);
+    return `<div class="stat-card">
+      <div class="stat-emoji">${m?.emoji||'🌸'}</div>
+      <div class="stat-count">${count}</div>
+      <div class="stat-label">${m?.label||key} día${count!==1?'s':''}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderLegend() {
+  document.getElementById('legend').innerHTML = MOODS.map(m =>
+    `<div class="legend-item"><span class="legend-emoji">${m.emoji}</span> ${m.label}</div>`).join('');
+}
+
+// DETAIL TOOLTIP
+function showDetail(e, key) {
+  const entry = data[key];
+  if (!entry) return;
+  const m = MOODS.find(x => x.key === entry.mood);
+  const [y, mo, d] = key.split('-');
+  const dateObj = new Date(+y, +mo-1, +d);
+  document.getElementById('ddDate').textContent = `${DAYS_ES[dateObj.getDay()]}, ${+d} de ${MONTHS_ES[+mo-1].toLowerCase()}`;
+  document.getElementById('ddEmoji').textContent = m?.emoji || '';
+  document.getElementById('ddLabel').textContent = m?.label || '';
+  document.getElementById('ddNote').textContent = entry.note || '';
+  const det = document.getElementById('dayDetail');
+  det.classList.add('visible');
+  const rect = e.target.closest('.cal-day').getBoundingClientRect();
+  det.style.left = Math.min(rect.left, window.innerWidth - 220) + 'px';
+  det.style.top = (rect.bottom + 8 + window.scrollY) + 'px';
+}
+function hideDetail() { document.getElementById('dayDetail').classList.remove('visible'); }
+
+function clickDay(key) {
+  // If it's today, do nothing (handled by today card)
+  if (key === todayKey) return;
+  // For past days, allow editing via prompt (simple)
+  const entry = data[key];
+  const [y, mo, d] = key.split('-');
+  const dateStr = `${+d} de ${MONTHS_ES[+mo-1].toLowerCase()} ${y}`;
+  if (entry) {
+    if (confirm(`¿Eliminar el registro del ${dateStr}?`)) {
+      delete data[key];
+      save(); renderCal();
+    }
+  }
+}
+
+load();
+</script>
+</body>
+</html>

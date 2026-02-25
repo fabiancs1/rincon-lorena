@@ -1,0 +1,13 @@
+{
+  "descripcion": "Los libros que él eligió para ti con todo el amor 🌹",
+  "libros": [
+    {
+      "titulo": "Los siete maridos de Evelyn Hugo",
+      "autor": "Taylor Jenkins Reid",
+      "generos": ["Novela", "Romance", "Drama", "Ficción histórica"],
+      "sinopsis": "La reclusa actriz de Hollywood Evelyn Hugo decide contar la verdad sobre su deslumbrante y escandalosa vida. Cuando convoca a Monique Grant, una joven periodista poco conocida, nadie entiende por qué.\n\nSiete matrimonios. Incontables escándalos. Pero solo un gran amor.",
+      "portada": "",
+      "pdf_url": "annas-arch-60021976a045.pdf"
+    }
+  ]
+}
