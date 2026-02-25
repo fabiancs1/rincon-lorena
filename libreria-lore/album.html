@@ -185,7 +185,7 @@ async function uploadToImgBB(base64data) {
   throw new Error('ImgBB error');
 }
 
-function renderGrid() {
+window.renderGrid = function() {
   const grid = document.getElementById('photoGrid');
   const count = document.getElementById('photoCount');
   count.textContent = photos.length ? `${photos.length} foto${photos.length !== 1 ? 's' : ''} guardadas` : 'Tus fotos, solo para ti';
@@ -201,7 +201,7 @@ function renderGrid() {
     </div>`).join('');
 }
 
-function handleFiles(e) {
+window.handleFiles = function(e) {
   const files = [...e.target.files];
   if (!files.length) return;
   processNext(files, 0);
@@ -253,7 +253,7 @@ window.deletePhoto = async function(i) { if (confirm('¿Eliminar esta foto?')) {
 window.openLB = function(i) { lbIndex = i; updateLB(); document.getElementById('lightbox').classList.add('active'); }
 window.closeLB = function() { document.getElementById('lightbox').classList.remove('active'); }
 window.lbNav = function(d) { lbIndex = (lbIndex + d + photos.length) % photos.length; updateLB(); }
-function updateLB() { document.getElementById('lbImg').src = photos[lbIndex].src; document.getElementById('lbCaption').textContent = photos[lbIndex].caption || ''; }
+window.updateLB = function() { document.getElementById('lbImg').src = photos[lbIndex].src; document.getElementById('lbCaption').textContent = photos[lbIndex].caption || ''; }
 document.getElementById('lightbox').addEventListener('click', e => { if (e.target === document.getElementById('lightbox')) closeLB(); });
 document.addEventListener('keydown', e => {
   if (!document.getElementById('lightbox').classList.contains('active')) return;
@@ -273,7 +273,7 @@ uz.addEventListener('drop', e => {
 });
 
 // EXPORT BACKUP
-function exportBackup() {
+window.exportBackup = function() {
   if (!photos.length) { alert('No hay fotos para guardar todavía 🌸'); return; }
   const data = JSON.stringify({ version: 1, exported: new Date().toISOString(), photos });
   const blob = new Blob([data], { type: 'application/json' });
@@ -286,7 +286,7 @@ function exportBackup() {
 }
 
 // IMPORT BACKUP
-function importBackup(e) {
+window.importBackup = function(e) {
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
@@ -300,7 +300,7 @@ function importBackup(e) {
         const existingSrcs = new Set(photos.map(p => p.src.slice(0, 50)));
         const newPhotos = incoming.filter(p => !existingSrcs.has(p.src.slice(0, 50)));
         photos = [...newPhotos, ...photos];
-        savePhotosLS();
+        savePhotos();
         renderGrid();
         alert(`✨ Se restauraron ${newPhotos.length} foto(s).`);
       }
