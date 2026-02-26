@@ -17,19 +17,14 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 .nav-link:hover{color:var(--cream);}
 .nav-link.active{color:var(--gold);border-color:rgba(201,168,76,0.25);background:var(--soft-gold);}
 .page-body{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:40px 20px 80px;}
-.page-header{margin-bottom:24px;}
+.page-header{margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
 .page-header h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,2.6rem);}
 .page-header h1 em{color:var(--rose);font-style:italic;}
 
-/* ALBUMS TABS */
-.albums-bar{display:flex;align-items:center;gap:8px;margin-bottom:24px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
-.albums-bar::-webkit-scrollbar{display:none;}
-.album-tab{background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:8px 18px;border-radius:22px;font-family:'Cormorant Garamond',serif;font-size:0.85rem;cursor:pointer;transition:all 0.2s;white-space:nowrap;flex-shrink:0;}
-.album-tab:hover{color:var(--cream);}
-.album-tab.active{background:var(--soft-gold);border-color:rgba(201,168,76,0.35);color:var(--gold);}
-.album-tab .count{font-size:0.7rem;opacity:0.6;margin-left:4px;}
-.btn-new-album{background:none;border:1px dashed rgba(201,168,76,0.3);color:var(--muted);padding:8px 14px;border-radius:22px;font-family:'Cormorant Garamond',serif;font-size:0.82rem;cursor:pointer;transition:all 0.2s;white-space:nowrap;flex-shrink:0;}
-.btn-new-album:hover{border-color:var(--gold);color:var(--gold);}
+/* LOADING */
+.loading-bar{text-align:center;padding:60px 20px;color:var(--muted);font-style:italic;}
+.loading-bar .spin{font-size:2rem;display:block;margin-bottom:12px;animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
 
 /* UPLOAD */
 .upload-zone{border:2px dashed rgba(201,168,76,0.2);border-radius:18px;padding:28px;text-align:center;cursor:pointer;transition:all 0.3s;margin-bottom:24px;background:rgba(201,168,76,0.02);}
@@ -37,6 +32,16 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 .upload-zone .uz-icon{font-size:2rem;margin-bottom:8px;}
 .upload-zone p{color:var(--muted);font-style:italic;font-size:0.9rem;}
 .upload-zone span{color:var(--gold);font-size:0.75rem;}
+
+/* ALBUMS TABS */
+.albums-bar{display:flex;align-items:center;gap:8px;margin-bottom:24px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+.albums-bar::-webkit-scrollbar{display:none;}
+.album-tab{background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:8px 18px;border-radius:22px;font-family:'Cormorant Garamond',serif;font-size:0.85rem;cursor:pointer;transition:all 0.2s;white-space:nowrap;flex-shrink:0;}
+.album-tab:hover{color:var(--cream);}
+.album-tab.active{background:var(--soft-gold);border-color:rgba(201,168,76,0.35);color:var(--gold);}
+.album-tab .cnt{font-size:0.7rem;opacity:0.6;margin-left:3px;}
+.btn-new-album{background:none;border:1px dashed rgba(201,168,76,0.3);color:var(--muted);padding:8px 14px;border-radius:22px;font-family:'Cormorant Garamond',serif;font-size:0.82rem;cursor:pointer;transition:all 0.2s;white-space:nowrap;flex-shrink:0;}
+.btn-new-album:hover{border-color:var(--gold);color:var(--gold);}
 
 /* PHOTO GRID */
 .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;}
@@ -46,8 +51,12 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 .photo-del{position:absolute;top:7px;right:7px;background:rgba(0,0,0,0.65);color:white;border:none;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:0.7rem;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s;backdrop-filter:blur(4px);}
 .photo-item:hover .photo-del{opacity:1;}
 .photo-caption{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.7));padding:12px 10px 7px;font-size:0.75rem;color:rgba(255,255,255,0.85);font-style:italic;}
-.empty-state{text-align:center;padding:50px 20px;color:var(--muted);}
+.empty-state{text-align:center;padding:50px 20px;color:var(--muted);grid-column:1/-1;}
 .empty-state .icon{font-size:2.8rem;margin-bottom:12px;opacity:0.4;}
+
+/* UPLOAD STATUS */
+.upload-status{display:none;position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border-rose);border-radius:14px;padding:14px 18px;z-index:500;font-size:0.88rem;color:var(--cream);box-shadow:0 8px 32px rgba(0,0,0,0.5);}
+.upload-status.visible{display:flex;align-items:center;gap:10px;}
 
 /* LIGHTBOX */
 .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.96);z-index:300;align-items:center;justify-content:center;padding:20px;}
@@ -58,19 +67,21 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 .lightbox-nav{position:fixed;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.08);border:none;color:white;width:42px;height:42px;border-radius:50%;cursor:pointer;font-size:1.3rem;backdrop-filter:blur(4px);transition:background 0.2s;display:flex;align-items:center;justify-content:center;}
 .lightbox-nav:hover{background:rgba(255,255,255,0.18);}
 .lb-prev{left:14px;}.lb-next{right:14px;}
-.lightbox-caption{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.55);font-style:italic;font-size:0.88rem;text-align:center;}
+.lightbox-caption{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.55);font-style:italic;font-size:0.88rem;}
 
 /* CAPTION MODAL */
 .cap-overlay{display:none;position:fixed;inset:0;background:rgba(5,2,8,0.85);backdrop-filter:blur(10px);z-index:400;align-items:center;justify-content:center;padding:20px;}
 .cap-overlay.active{display:flex;}
 .cap-modal{background:var(--surface);border:1px solid var(--border-rose);border-radius:20px;padding:28px 24px;max-width:400px;width:100%;}
 .cap-modal h3{font-family:'Playfair Display',serif;margin-bottom:16px;font-style:italic;font-size:1.1rem;}
-.cap-modal input,.cap-modal select{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--cream);padding:11px 14px;border-radius:12px;font-family:'Cormorant Garamond',serif;font-size:0.95rem;outline:none;margin-bottom:12px;transition:border-color 0.2s;}
+.cap-preview{width:100%;height:140px;object-fit:cover;border-radius:10px;margin-bottom:14px;display:block;}
+.cap-modal input,.cap-modal select{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--cream);padding:11px 14px;border-radius:12px;font-family:'Cormorant Garamond',serif;font-size:0.95rem;outline:none;margin-bottom:12px;}
 .cap-modal input::placeholder{color:var(--muted);}
 .cap-modal input:focus,.cap-modal select:focus{border-color:var(--border-rose);}
 .cap-modal select option{background:var(--surface2);}
 .cap-btns{display:flex;gap:10px;justify-content:flex-end;margin-top:4px;}
 .btn-confirm{background:linear-gradient(135deg,var(--deep-rose),var(--rose));color:white;border:none;padding:10px 22px;border-radius:20px;font-family:'Cormorant Garamond',serif;font-size:0.92rem;cursor:pointer;}
+.btn-confirm:disabled{opacity:0.5;cursor:not-allowed;}
 .btn-skip{background:none;border:1px solid var(--border);color:var(--muted);padding:10px 18px;border-radius:20px;font-family:'Cormorant Garamond',serif;font-size:0.92rem;cursor:pointer;}
 
 /* NEW ALBUM MODAL */
@@ -80,7 +91,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 .album-modal input::placeholder{color:var(--muted);}
 .album-modal input:focus{border-color:var(--border-rose);}
 
-.photo-count{color:var(--muted);font-size:0.8rem;font-style:italic;margin-left:auto;}
 @media(max-width:600px){.topbar-nav .nav-text{display:none;}.photo-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));}}
 </style>
 </head>
@@ -94,25 +104,30 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
     <a href="calendario.html" class="nav-link">📅<span class="nav-text"> Agenda</span></a>
     <a href="diario.html" class="nav-link">💭<span class="nav-text"> Diario</span></a>
     <a href="album.html" class="nav-link active">🖼️<span class="nav-text"> Álbum</span></a>
+    <a href="wishlist.html" class="nav-link">✨<span class="nav-text"> Wishlist</span></a>
+    <a href="mood.html" class="nav-link">🌙<span class="nav-text"> Mood</span></a>
   </nav>
 </header>
+
 <div class="page-body">
   <div class="page-header">
     <h1>Tu <em>Álbum</em> 🖼️</h1>
   </div>
-
-  <!-- ALBUMS BAR -->
   <div class="albums-bar" id="albumsBar"></div>
-
-  <!-- UPLOAD -->
   <div class="upload-zone" id="uploadZone" onclick="document.getElementById('photoInput').click()">
     <div class="uz-icon">📸</div>
     <p>Toca aquí para agregar fotos</p>
     <span>Desde tu celular o computador</span>
   </div>
   <input type="file" id="photoInput" accept="image/*" multiple style="display:none" onchange="handleFiles(event)">
+  <div class="photo-grid" id="photoGrid">
+    <div class="loading-bar"><span class="spin">🌸</span>Cargando fotos...</div>
+  </div>
+</div>
 
-  <div class="photo-grid" id="photoGrid"></div>
+<!-- UPLOAD STATUS -->
+<div class="upload-status" id="uploadStatus">
+  <span>📤</span><span id="uploadStatusText">Subiendo foto...</span>
 </div>
 
 <!-- LIGHTBOX -->
@@ -128,11 +143,12 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 <div class="cap-overlay" id="capOverlay">
   <div class="cap-modal">
     <h3>¿Título para esta foto? 🌸</h3>
+    <img class="cap-preview" id="capPreview" src="" alt="">
     <input type="text" id="capInput" placeholder="Ej: Mi momento favorito..." maxlength="60">
     <select id="capAlbum"></select>
     <div class="cap-btns">
-      <button class="btn-skip" onclick="savePhoto('')">Sin título</button>
-      <button class="btn-confirm" onclick="savePhoto(document.getElementById('capInput').value)">Guardar ✨</button>
+      <button class="btn-skip" id="btnSkip" onclick="savePhoto('')">Sin título</button>
+      <button class="btn-confirm" id="btnConfirm" onclick="savePhoto(document.getElementById('capInput').value)">Guardar ✨</button>
     </div>
   </div>
 </div>
@@ -150,12 +166,10 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 </div>
 
 <script type="module">
-// ── DATA ──────────────────────────────────────────────
-const DEFAULT_ALBUMS = ['Todas', 'Favoritas', 'Nosotros'];
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-const firebaseConfig = {
+const FIREBASE_CONFIG = {
   apiKey: "AIzaSyA2YJXgAZAjOVqZ3eeTiMa9kCKaut_cA2w",
   authDomain: "lore-basedatos.firebaseapp.com",
   databaseURL: "https://lore-basedatos-default-rtdb.firebaseio.com",
@@ -164,152 +178,213 @@ const firebaseConfig = {
   messagingSenderId: "348470598297",
   appId: "1:348470598297:web:4634471f293f24a64fb608"
 };
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
 const IMGBB_KEY = "3dec58925d383bab2caebdbb0e2f43e0";
+const DEFAULT_ALBUMS = ['Favoritas', 'Nosotros'];
+
+const app = initializeApp(FIREBASE_CONFIG);
+const db = getDatabase(app);
+
+// STATE
+let photos = [];
 let albums = [];
 let currentAlbum = 'Todas';
+let pendingFiles = [];
+let pendingIndex = 0;
 let pendingPhoto = null;
-let lbIndex = 0;
 let lbPhotos = [];
+let lbIndex = 0;
 
+// ── FIREBASE ──────────────────────────────────────────
 async function loadData() {
   try {
     const snap = await get(ref(db, 'album'));
     const val = snap.val();
-    photos = val?.photos || [];
-    albums = val?.albums || [...DEFAULT_ALBUMS];
-  } catch { photos = []; albums = [...DEFAULT_ALBUMS]; }
-}
-async function saveData() {
-  try { await set(ref(db, 'album'), { photos, albums }); } catch(e) { console.error('Error:', e); }
-}
-async function uploadToImgBB(base64data) {
-  const base64 = base64data.split(',')[1];
-  const form = new FormData();
-  form.append('image', base64);
-  const res = await fetch('https://api.imgbb.com/1/upload?key=' + IMGBB_KEY, { method: 'POST', body: form });
-  const json = await res.json();
-  if (json.success) return json.data.url;
-  throw new Error('ImgBB upload failed');
+    photos = val && val.photos ? val.photos : [];
+    albums = val && val.albums ? val.albums : [...DEFAULT_ALBUMS];
+  } catch(e) {
+    console.error('Error cargando datos:', e);
+    photos = [];
+    albums = [...DEFAULT_ALBUMS];
+  }
 }
 
-// ── ALBUMS BAR ────────────────────────────────────────
+async function saveData() {
+  try {
+    await set(ref(db, 'album'), { photos, albums });
+  } catch(e) {
+    console.error('Error guardando datos:', e);
+    showStatus('❌ Error guardando. Intenta de nuevo.');
+    setTimeout(hideStatus, 3000);
+  }
+}
+
+// ── IMGBB ─────────────────────────────────────────────
+async function uploadToImgBB(base64data) {
+  // Remove the data:image/...;base64, prefix
+  const base64 = base64data.indexOf(',') !== -1 ? base64data.split(',')[1] : base64data;
+  const formData = new FormData();
+  formData.append('image', base64);
+  const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {
+    method: 'POST',
+    body: formData
+  });
+  const result = await response.json();
+  if (result.success) return result.data.url;
+  throw new Error('ImgBB error: ' + JSON.stringify(result));
+}
+
+// ── STATUS TOAST ──────────────────────────────────────
+function showStatus(msg) {
+  document.getElementById('uploadStatusText').textContent = msg;
+  document.getElementById('uploadStatus').classList.add('visible');
+}
+function hideStatus() {
+  document.getElementById('uploadStatus').classList.remove('visible');
+}
+
+// ── RENDER ────────────────────────────────────────────
 function renderAlbumsBar() {
   const bar = document.getElementById('albumsBar');
-  bar.innerHTML = albums.map(a => {
+  const allAlbums = ['Todas', ...albums];
+  bar.innerHTML = allAlbums.map(a => {
     const cnt = a === 'Todas' ? photos.length : photos.filter(p => p.album === a).length;
-    return `<button class="album-tab${currentAlbum===a?' active':''}" onclick="selectAlbum('${a}')">${a} <span class="count">${cnt}</span></button>`;
-  }).join('') + `<button class="btn-new-album" onclick="openAlbumModal()">+ Álbum</button>`;
+    return `<button class="album-tab${currentAlbum === a ? ' active' : ''}" onclick="selectAlbum('${a}')">${a} <span class="cnt">${cnt}</span></button>`;
+  }).join('') + `<button class="btn-new-album" onclick="openAlbumModal()">＋ Álbum</button>`;
 }
 
-function selectAlbum(name) {
-  currentAlbum = name;
-  renderAlbumsBar();
-  renderGrid();
-}
-
-// ── GRID ──────────────────────────────────────────────
 function renderGrid() {
   const grid = document.getElementById('photoGrid');
   const filtered = currentAlbum === 'Todas' ? photos : photos.filter(p => p.album === currentAlbum);
+  lbPhotos = filtered;
   if (!filtered.length) {
-    grid.innerHTML = `<div class="empty-state"><div class="icon">📷</div><p>${currentAlbum === 'Todas' ? 'Aún no hay fotos. ¡Agrega tu primera!' : 'Este álbum está vacío.'}</p></div>`;
+    grid.innerHTML = `<div class="empty-state"><div class="icon">📷</div><p>${currentAlbum === 'Todas' ? '¡Agrega tu primera foto!' : 'Este álbum está vacío.'}</p></div>`;
     return;
   }
-  lbPhotos = filtered;
   grid.innerHTML = filtered.map((p, i) => `
     <div class="photo-item" onclick="openLB(${i})">
-      <img src="${p.src}" alt="${p.caption||''}">
+      <img src="${p.src}" alt="${p.caption || ''}" loading="lazy" onerror="this.parentElement.style.opacity='0.4'">
       ${p.caption ? `<div class="photo-caption">${p.caption}</div>` : ''}
       <button class="photo-del" onclick="event.stopPropagation();deletePhoto('${p.id}')">✕</button>
     </div>`).join('');
 }
 
-// ── UPLOAD ────────────────────────────────────────────
-function handleFiles(e) {
-  const files = [...e.target.files];
-  if (!files.length) return;
-  processNext(files, 0);
-  e.target.value = '';
-}
+window.selectAlbum = function(name) {
+  currentAlbum = name;
+  renderAlbumsBar();
+  renderGrid();
+};
 
-function processNext(files, i) {
-  if (i >= files.length) return;
+// ── UPLOAD ────────────────────────────────────────────
+window.handleFiles = function(e) {
+  const files = [...e.target.files].filter(f => f.type.startsWith('image/'));
+  if (!files.length) return;
+  e.target.value = '';
+  pendingFiles = files;
+  pendingIndex = 0;
+  processNextFile();
+};
+
+function processNextFile() {
+  if (pendingIndex >= pendingFiles.length) return;
+  const file = pendingFiles[pendingIndex];
   const reader = new FileReader();
-  reader.onload = ev => {
-    // Store base64 temporarily for preview only
-    pendingPhoto = { src: ev.target.result, srcBase64: ev.target.result, caption: '', album: currentAlbum === 'Todas' ? 'Todas' : currentAlbum, date: new Date().toISOString(), id: Date.now() + '_' + i };
+  reader.onload = function(ev) {
+    const base64 = ev.target.result;
+    pendingPhoto = {
+      id: Date.now() + '_' + pendingIndex,
+      srcBase64: base64,
+      src: base64, // preview
+      caption: '',
+      album: currentAlbum === 'Todas' ? albums[0] || 'Fotos' : currentAlbum,
+      date: new Date().toISOString()
+    };
+    // Show preview in modal
+    document.getElementById('capPreview').src = base64;
     const sel = document.getElementById('capAlbum');
-    sel.innerHTML = albums.filter(a => a !== 'Todas').map(a => `<option value="${a}"${pendingPhoto.album===a?' selected':''}>${a}</option>`).join('');
+    sel.innerHTML = albums.map(a => `<option value="${a}"${pendingPhoto.album === a ? ' selected' : ''}>${a}</option>`).join('');
     document.getElementById('capInput').value = '';
+    document.getElementById('btnConfirm').disabled = false;
+    document.getElementById('btnSkip').disabled = false;
     document.getElementById('capOverlay').classList.add('active');
     document.getElementById('capInput').focus();
-    window._pendingNext = () => processNext(files, i + 1);
   };
-  reader.readAsDataURL(files[i]);
+  reader.readAsDataURL(file);
 }
 
-async function savePhoto(caption) {
+window.savePhoto = async function(caption) {
   if (!pendingPhoto) return;
-  pendingPhoto.caption = caption.trim();
-  const selAlbum = document.getElementById('capAlbum').value;
-  pendingPhoto.album = selAlbum || 'Sin categoría';
+
+  // Disable buttons while uploading
+  document.getElementById('btnConfirm').disabled = true;
+  document.getElementById('btnSkip').disabled = true;
   document.getElementById('capOverlay').classList.remove('active');
 
-  // Show uploading state
-  const btn = document.querySelector('.btn-confirm');
-  const origText = btn ? btn.textContent : '';
-  if (btn) btn.textContent = 'Subiendo foto... 📤';
+  const photo = pendingPhoto;
+  photo.caption = caption.trim();
+  photo.album = document.getElementById('capAlbum').value || albums[0] || 'Fotos';
+  pendingPhoto = null;
+
+  showStatus(`📤 Subiendo foto ${pendingIndex + 1} de ${pendingFiles.length}...`);
 
   try {
-    // Upload to ImgBB, store URL instead of base64
-    const imgUrl = await uploadToImgBB(pendingPhoto.srcBase64);
-    pendingPhoto.src = imgUrl;
-    delete pendingPhoto.srcBase64;
+    const url = await uploadToImgBB(photo.srcBase64);
+    photo.src = url;
+    delete photo.srcBase64;
+    showStatus('💾 Guardando...');
+    photos.unshift(photo);
+    await saveData();
+    renderAlbumsBar();
+    renderGrid();
+    showStatus('✅ ¡Foto guardada!');
+    setTimeout(hideStatus, 2000);
   } catch(e) {
-    console.error('Error subiendo imagen:', e);
-    // Fallback: keep base64 if ImgBB fails
-    delete pendingPhoto.srcBase64;
+    console.error('Error subiendo foto:', e);
+    showStatus('❌ Error al subir. Intenta de nuevo.');
+    setTimeout(hideStatus, 4000);
   }
 
-  if (btn) btn.textContent = origText;
-  photos.unshift(pendingPhoto);
+  pendingIndex++;
+  if (pendingIndex < pendingFiles.length) {
+    setTimeout(processNextFile, 500);
+  }
+};
+
+window.deletePhoto = async function(id) {
+  if (!confirm('¿Eliminar esta foto?')) return;
+  photos = photos.filter(p => String(p.id) !== String(id));
   await saveData();
   renderAlbumsBar();
   renderGrid();
-  pendingPhoto = null;
-  if (window._pendingNext) { window._pendingNext(); window._pendingNext = null; }
-}
-
-document.getElementById('capInput').addEventListener('keydown', e => { if (e.key === 'Enter') savePhoto(document.getElementById('capInput').value); });
-
-function deletePhoto(id) {
-  if (!confirm('¿Eliminar esta foto?')) return;
-  photos = photos.filter(p => p.id != id);
-  saveData(); renderAlbumsBar(); renderGrid();
-}
+};
 
 // ── ALBUM MANAGEMENT ─────────────────────────────────
-function openAlbumModal() { document.getElementById('albumNameInput').value = ''; document.getElementById('albumOverlay').classList.add('active'); document.getElementById('albumNameInput').focus(); }
-function closeAlbumModal() { document.getElementById('albumOverlay').classList.remove('active'); }
-function createAlbum() {
+window.openAlbumModal = function() {
+  document.getElementById('albumNameInput').value = '';
+  document.getElementById('albumOverlay').classList.add('active');
+  setTimeout(() => document.getElementById('albumNameInput').focus(), 100);
+};
+window.closeAlbumModal = function() {
+  document.getElementById('albumOverlay').classList.remove('active');
+};
+window.createAlbum = async function() {
   const name = document.getElementById('albumNameInput').value.trim();
   if (!name) return;
-  if (!albums.includes(name)) { albums.push(name); saveData(); }
+  if (!albums.includes(name)) {
+    albums.push(name);
+    await saveData();
+  }
   closeAlbumModal();
   selectAlbum(name);
-}
+};
 document.getElementById('albumNameInput').addEventListener('keydown', e => { if (e.key === 'Enter') createAlbum(); });
 
-// ── LIGHTBOX ──────────────────────────────────────────
-function openLB(i) { lbIndex = i; updateLB(); document.getElementById('lightbox').classList.add('active'); }
-function closeLB() { document.getElementById('lightbox').classList.remove('active'); }
-function lbNav(d) { lbIndex = (lbIndex + d + lbPhotos.length) % lbPhotos.length; updateLB(); }
+// ── LIGHTBOX ─────────────────────────────────────────
+window.openLB = function(i) { lbIndex = i; updateLB(); document.getElementById('lightbox').classList.add('active'); };
+window.closeLB = function() { document.getElementById('lightbox').classList.remove('active'); };
+window.lbNav = function(d) { lbIndex = (lbIndex + d + lbPhotos.length) % lbPhotos.length; updateLB(); };
 function updateLB() {
   document.getElementById('lbImg').src = lbPhotos[lbIndex].src;
-  const alb = lbPhotos[lbIndex].album !== 'Todas' ? ` · ${lbPhotos[lbIndex].album}` : '';
-  document.getElementById('lbCaption').textContent = (lbPhotos[lbIndex].caption || '') + alb;
+  document.getElementById('lbCaption').textContent = lbPhotos[lbIndex].caption || '';
 }
 document.getElementById('lightbox').addEventListener('click', e => { if (e.target === document.getElementById('lightbox')) closeLB(); });
 document.addEventListener('keydown', e => {
@@ -319,12 +394,22 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeLB();
 });
 
-// Drag & drop
+// ── DRAG & DROP ───────────────────────────────────────
 const uz = document.getElementById('uploadZone');
 uz.addEventListener('dragover', e => { e.preventDefault(); uz.classList.add('drag-over'); });
 uz.addEventListener('dragleave', () => uz.classList.remove('drag-over'));
-uz.addEventListener('drop', e => { e.preventDefault(); uz.classList.remove('drag-over'); const files=[...e.dataTransfer.files].filter(f=>f.type.startsWith('image/')); if(files.length) processNext(files,0); });
+uz.addEventListener('drop', e => {
+  e.preventDefault();
+  uz.classList.remove('drag-over');
+  const files = [...e.dataTransfer.files].filter(f => f.type.startsWith('image/'));
+  if (files.length) { pendingFiles = files; pendingIndex = 0; processNextFile(); }
+});
 
+document.getElementById('capInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') savePhoto(document.getElementById('capInput').value);
+});
+
+// ── INIT ─────────────────────────────────────────────
 (async () => {
   await loadData();
   renderAlbumsBar();
