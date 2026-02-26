@@ -339,17 +339,53 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
   </div>
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA2YJXgAZAjOVqZ3eeTiMa9kCKaut_cA2w",
+  authDomain: "lore-basedatos.firebaseapp.com",
+  databaseURL: "https://lore-basedatos-default-rtdb.firebaseio.com",
+  projectId: "lore-basedatos",
+  storageBucket: "lore-basedatos.firebasestorage.app",
+  messagingSenderId: "348470598297",
+  appId: "1:348470598297:web:4634471f293f24a64fb608"
+};
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
 const DEFAULT_PIN = '1234';
 let selectedMood = '';
+let _entries = [];
 
-function getPin()     { return localStorage.getItem('lorena_diary_pin') || DEFAULT_PIN; }
-function getEntries() { try{ return JSON.parse(localStorage.getItem('lorena_diary_entries') || '[]'); }catch{ return []; } }
-function saveEntries(e){ localStorage.setItem('lorena_diary_entries', JSON.stringify(e)); }
+function getPin() { return localStorage.getItem('lorena_diary_pin') || DEFAULT_PIN; }
+
+async function loadEntries() {
+  try {
+    const snap = await get(ref(db, 'diario/entries'));
+    _entries = snap.val() || [];
+  } catch(e) {
+    console.error('Error cargando diario:', e);
+    _entries = [];
+  }
+}
+
+function getEntries() { return _entries; }
+
+async function saveEntries(entries) {
+  _entries = entries;
+  try {
+    await set(ref(db, 'diario/entries'), entries);
+  } catch(e) {
+    console.error('Error guardando diario:', e);
+    alert('Error al guardar. Verifica tu conexión.');
+  }
+}
 
 // ── PIN ───────────────────────────────────────────────
-function nextPin(i){ const v=document.getElementById(`p${i}`).value; if(v&&i<3) document.getElementById(`p${i+1}`).focus(); }
-function tryUnlock(){
+window.nextPin = function(i){ const v=document.getElementById(`p${i}`).value; if(v&&i<3) document.getElementById(`p${i+1}`).focus(); }
+window.tryUnlock = function(){
   const pin=[0,1,2,3].map(i=>document.getElementById(`p${i}`).value).join('');
   if(pin===getPin()){ unlock(); }
   else{
@@ -362,44 +398,49 @@ document.addEventListener('keydown', e=>{
   if(e.key==='Enter' && document.getElementById('lockScreen').style.display!=='none') tryUnlock();
 });
 
-function unlock(){
+window.unlock = async function(){
   document.getElementById('lockScreen').style.display='none';
   document.getElementById('diaryView').style.display='block';
   const now=new Date();
   document.getElementById('newEntryDate').textContent=now.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('entriesList').innerHTML='<div class="empty-diary">Cargando entradas... 🌸</div>';
+  await loadEntries();
   renderEntries();
 }
-function lockDiary(){
+window.lockDiary = function(){
   document.getElementById('lockScreen').style.display='flex';
   document.getElementById('diaryView').style.display='none';
   [0,1,2,3].forEach(i=>document.getElementById(`p${i}`).value='');
   document.getElementById('lockError').style.display='none';
 }
-function changePIN(){
+window.changePIN = function(){
   const np=prompt('Nuevo PIN (4 dígitos):');
   if(np&&/^\d{4}$/.test(np)){ localStorage.setItem('lorena_diary_pin',np); alert('PIN actualizado 🌹'); }
   else if(np){ alert('El PIN debe ser exactamente 4 números.'); }
 }
 
 // ── MOOD ─────────────────────────────────────────────
-function selectMood(btn){
+window.selectMood = function(btn){
   document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('selected'));
   btn.classList.add('selected');
   selectedMood = btn.dataset.mood;
 }
 
 // ── SAVE ENTRY ───────────────────────────────────────
-function saveEntry(){
+window.saveEntry = async function(){
   const title=document.getElementById('entryTitle').value.trim();
   const body=document.getElementById('entryBody').value.trim();
   if(!body) return;
+  const btn = document.querySelector('.btn-save');
+  if(btn) { btn.textContent='Guardando... 💾'; btn.disabled=true; }
   const entries=getEntries();
   entries.unshift({ title:title||'Sin título', body, mood:selectedMood, date:new Date().toISOString() });
-  saveEntries(entries);
+  await saveEntries(entries);
   document.getElementById('entryTitle').value='';
   document.getElementById('entryBody').value='';
   document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('selected'));
   selectedMood='';
+  if(btn) { btn.textContent='Guardar entrada ✨'; btn.disabled=false; }
   renderEntries();
 }
 
@@ -425,13 +466,13 @@ function renderEntries(){
   }).join('');
 }
 
-function deleteEntry(i){
+window.deleteEntry = async function(i){
   if(!confirm('¿Eliminar esta entrada?')) return;
-  const entries=getEntries(); entries.splice(i,1); saveEntries(entries); renderEntries();
+  const entries=getEntries(); entries.splice(i,1); await saveEntries(entries); renderEntries();
 }
 
 // ── PAPER MODAL ───────────────────────────────────────
-function openPaper(i){
+window.openPaper = function(i){
   const entries=getEntries();
   const e=entries[i];
   const d=new Date(e.date);
@@ -453,7 +494,7 @@ function openPaper(i){
   document.body.style.overflow='hidden';
 }
 
-function closePaper(){
+window.closePaper = function(){
   const sheet=document.getElementById('paperSheet');
   sheet.classList.add('closing');
   setTimeout(()=>{
