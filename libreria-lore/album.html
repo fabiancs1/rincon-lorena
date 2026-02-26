@@ -149,23 +149,49 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
   </div>
 </div>
 
-<script>
+<script type="module">
 // ── DATA ──────────────────────────────────────────────
 const DEFAULT_ALBUMS = ['Todas', 'Favoritas', 'Nosotros'];
-let photos = [];
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA2YJXgAZAjOVqZ3eeTiMa9kCKaut_cA2w",
+  authDomain: "lore-basedatos.firebaseapp.com",
+  databaseURL: "https://lore-basedatos-default-rtdb.firebaseio.com",
+  projectId: "lore-basedatos",
+  storageBucket: "lore-basedatos.firebasestorage.app",
+  messagingSenderId: "348470598297",
+  appId: "1:348470598297:web:4634471f293f24a64fb608"
+};
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const IMGBB_KEY = "3dec58925d383bab2caebdbb0e2f43e0";
 let albums = [];
 let currentAlbum = 'Todas';
 let pendingPhoto = null;
 let lbIndex = 0;
 let lbPhotos = [];
 
-function loadData() {
-  try { photos = JSON.parse(localStorage.getItem('lorena_album2') || '[]'); } catch { photos = []; }
-  try { albums = JSON.parse(localStorage.getItem('lorena_albums') || 'null') || [...DEFAULT_ALBUMS]; } catch { albums = [...DEFAULT_ALBUMS]; }
+async function loadData() {
+  try {
+    const snap = await get(ref(db, 'album'));
+    const val = snap.val();
+    photos = val?.photos || [];
+    albums = val?.albums || [...DEFAULT_ALBUMS];
+  } catch { photos = []; albums = [...DEFAULT_ALBUMS]; }
 }
-function saveData() {
-  localStorage.setItem('lorena_album2', JSON.stringify(photos));
-  localStorage.setItem('lorena_albums', JSON.stringify(albums));
+async function saveData() {
+  try { await set(ref(db, 'album'), { photos, albums }); } catch(e) { console.error('Error:', e); }
+}
+async function uploadToImgBB(base64data) {
+  const base64 = base64data.split(',')[1];
+  const form = new FormData();
+  form.append('image', base64);
+  const res = await fetch('https://api.imgbb.com/1/upload?key=' + IMGBB_KEY, { method: 'POST', body: form });
+  const json = await res.json();
+  if (json.success) return json.data.url;
+  throw new Error('ImgBB upload failed');
 }
 
 // ── ALBUMS BAR ────────────────────────────────────────
@@ -212,8 +238,8 @@ function processNext(files, i) {
   if (i >= files.length) return;
   const reader = new FileReader();
   reader.onload = ev => {
-    pendingPhoto = { src: ev.target.result, caption: '', album: currentAlbum === 'Todas' ? 'Todas' : currentAlbum, date: new Date().toISOString(), id: Date.now() + '_' + i };
-    // Fill album select
+    // Store base64 temporarily for preview only
+    pendingPhoto = { src: ev.target.result, srcBase64: ev.target.result, caption: '', album: currentAlbum === 'Todas' ? 'Todas' : currentAlbum, date: new Date().toISOString(), id: Date.now() + '_' + i };
     const sel = document.getElementById('capAlbum');
     sel.innerHTML = albums.filter(a => a !== 'Todas').map(a => `<option value="${a}"${pendingPhoto.album===a?' selected':''}>${a}</option>`).join('');
     document.getElementById('capInput').value = '';
@@ -224,17 +250,35 @@ function processNext(files, i) {
   reader.readAsDataURL(files[i]);
 }
 
-function savePhoto(caption) {
+async function savePhoto(caption) {
   if (!pendingPhoto) return;
   pendingPhoto.caption = caption.trim();
   const selAlbum = document.getElementById('capAlbum').value;
   pendingPhoto.album = selAlbum || 'Sin categoría';
+  document.getElementById('capOverlay').classList.remove('active');
+
+  // Show uploading state
+  const btn = document.querySelector('.btn-confirm');
+  const origText = btn ? btn.textContent : '';
+  if (btn) btn.textContent = 'Subiendo foto... 📤';
+
+  try {
+    // Upload to ImgBB, store URL instead of base64
+    const imgUrl = await uploadToImgBB(pendingPhoto.srcBase64);
+    pendingPhoto.src = imgUrl;
+    delete pendingPhoto.srcBase64;
+  } catch(e) {
+    console.error('Error subiendo imagen:', e);
+    // Fallback: keep base64 if ImgBB fails
+    delete pendingPhoto.srcBase64;
+  }
+
+  if (btn) btn.textContent = origText;
   photos.unshift(pendingPhoto);
-  saveData();
+  await saveData();
   renderAlbumsBar();
   renderGrid();
   pendingPhoto = null;
-  document.getElementById('capOverlay').classList.remove('active');
   if (window._pendingNext) { window._pendingNext(); window._pendingNext = null; }
 }
 
@@ -281,9 +325,11 @@ uz.addEventListener('dragover', e => { e.preventDefault(); uz.classList.add('dra
 uz.addEventListener('dragleave', () => uz.classList.remove('drag-over'));
 uz.addEventListener('drop', e => { e.preventDefault(); uz.classList.remove('drag-over'); const files=[...e.dataTransfer.files].filter(f=>f.type.startsWith('image/')); if(files.length) processNext(files,0); });
 
-loadData();
-renderAlbumsBar();
-renderGrid();
+(async () => {
+  await loadData();
+  renderAlbumsBar();
+  renderGrid();
+})();
 </script>
 </body>
 </html>
