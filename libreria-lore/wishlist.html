@@ -192,8 +192,20 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 </div>
 
 <script type="module">
-import { db } from './firebase-config.js';
-import { ref, get, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyA2YJXgAZAjOVqZ3eeTiMa9kCKaut_cA2w",
+  authDomain: "lore-basedatos.firebaseapp.com",
+  databaseURL: "https://lore-basedatos-default-rtdb.firebaseio.com",
+  projectId: "lore-basedatos",
+  storageBucket: "lore-basedatos.firebasestorage.app",
+  messagingSenderId: "348470598297",
+  appId: "1:348470598297:web:4634471f293f24a64fb608"
+};
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const IMGBB_KEY = "3dec58925d383bab2caebdbb0e2f43e0";
 
 let items = [];
 let currentFilter = 'todo';
