@@ -282,6 +282,7 @@
 .gc:nth-child(6){animation-delay:3.00s}
 .gc:nth-child(7){animation-delay:3.07s}
 .gc:nth-child(8){animation-delay:3.14s}
+.gc:nth-child(9){animation-delay:3.21s}
 
 /* ── CARTAS MODAL ── */
 .carta {
@@ -360,6 +361,7 @@
     <a href="album.html" class="nav-link">🖼️<span class="nav-text"> Álbum</span></a>
     <a href="wishlist.html" class="nav-link">✨<span class="nav-text"> Wishlist</span></a>
     <a href="mood.html" class="nav-link">🌙<span class="nav-text"> Mood</span></a>
+    <a href="mascota.html" class="nav-link">🐰<span class="nav-text"> Nesquik</span></a>
   </nav>
 </header>
 
@@ -394,6 +396,7 @@
   <a href="diario.html"    class="gc"><div class="gc-icon">💭</div><div class="gc-name">Diario</div><div class="gc-desc">Solo tuyo</div></a>
   <a href="album.html"     class="gc"><div class="gc-icon">🖼️</div><div class="gc-name">Álbum</div><div class="gc-desc">Tus fotos</div></a>
   <a href="wishlist.html"  class="gc"><div class="gc-icon">✨</div><div class="gc-name">Wishlist</div><div class="gc-desc">Tus deseos</div></a>
+  <a href="mascota.html" class="gc gc-special"><div class="gc-icon">🐰</div><div class="gc-name">Nesquik</div><div class="gc-desc">Mi conejita</div></a>
   <div class="gc gc-special" onclick="openCartas()"><div class="gc-icon">💌</div><div class="gc-name">Cartitas</div><div class="gc-desc">De él para ti</div></div>
 </div>
 
@@ -505,5 +508,6 @@ function fmt(s){ if(!s)return ''; return new Date(s+'T00:00:00').toLocaleDateStr
 
 init();
 </script>
+<script src="coco_widget.js"></script>
 </body>
 </html>

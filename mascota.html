@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coco — Rincón de Lorena</title>
+<link rel="stylesheet" href="lore.css">
+<style>
+/* ── COQUETTE OVERRIDES ── */
+:root {
+  --pink:    #f4a7c0;
+  --pink2:   #fbd0e0;
+  --pink3:   #ffe8f2;
+  --blush:   #f9c6d8;
+  --ribbon:  #e8648a;
+  --ribbon2: #f2a0bc;
+  --petal:   rgba(244,167,192,0.15);
+  --soft:    rgba(244,167,192,0.08);
+}
+
+body { background: #0a0610; }
+
+/* floating hearts bg */
+.hearts-bg {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  overflow: hidden;
+}
+.hb { position: absolute; font-size: 0.9rem; opacity: 0; animation: floatHeart linear infinite; }
+@keyframes floatHeart {
+  0%   { opacity:0; transform: translateY(0) scale(0.8); }
+  10%  { opacity:0.25; }
+  90%  { opacity:0.1; }
+  100% { opacity:0; transform: translateY(-100vh) scale(1.2) rotate(20deg); }
+}
+
+/* ── MAIN LAYOUT ── */
+.pet-page {
+  position: relative; z-index: 1;
+  max-width: 480px; margin: 0 auto;
+  padding: 32px 20px 100px;
+  display: flex; flex-direction: column; align-items: center;
+}
+
+/* ── PAGE TITLE ── */
+.pet-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem; font-style: italic;
+  text-align: center; margin-bottom: 4px;
+  background: linear-gradient(135deg, var(--pink), var(--pink2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.pet-subtitle {
+  font-size: 0.72rem; color: var(--muted);
+  font-style: italic; text-align: center;
+  letter-spacing: 0.1em; margin-bottom: 28px;
+}
+
+/* ── STATUS BARS ── */
+.status-card {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid rgba(244,167,192,0.15);
+  border-radius: var(--r-xl);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+}
+.status-row {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 12px;
+}
+.status-row:last-child { margin-bottom: 0; }
+.status-icon { font-size: 1.1rem; width: 24px; text-align: center; flex-shrink: 0; }
+.status-label {
+  font-size: 0.68rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--muted);
+  width: 64px; flex-shrink: 0;
+}
+.bar-track {
+  flex: 1; height: 8px;
+  background: var(--surface2);
+  border-radius: 8px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+.bar-fill {
+  height: 100%; border-radius: 8px;
+  transition: width 0.8s cubic-bezier(0.34,1.2,0.64,1);
+}
+.bar-hambre  { background: linear-gradient(90deg, #f4a7c0, #fbd0e0); }
+.bar-feliz   { background: linear-gradient(90deg, #e8648a, #f4a7c0); }
+.bar-energia { background: linear-gradient(90deg, #d4ae4a, #eed080); }
+.bar-val {
+  font-size: 0.72rem; color: var(--muted);
+  width: 28px; text-align: right; flex-shrink: 0;
+}
+
+/* ── BUNNY STAGE ── */
+.stage {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid rgba(244,167,192,0.12);
+  border-radius: var(--r-xl);
+  padding: 28px 20px 20px;
+  display: flex; flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+  position: relative; overflow: hidden;
+  box-shadow: 0 12px 50px rgba(0,0,0,0.4);
+  min-height: 280px;
+}
+.stage::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 80%, rgba(244,167,192,0.06), transparent 65%);
+  pointer-events: none;
+}
+
+/* floor */
+.stage-floor {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 50px;
+  background: linear-gradient(transparent, rgba(244,167,192,0.05));
+  border-top: 1px solid rgba(244,167,192,0.08);
+}
+
+.state-label {
+  font-size: 0.65rem; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--pink);
+  margin-bottom: 14px; opacity: 0.7;
+}
+
+/* ── BUNNY SVG ── */
+.bunny-wrap {
+  position: relative; width: 160px; height: 200px;
+  cursor: pointer; transition: transform 0.2s;
+  margin-bottom: 8px;
+}
+.bunny-wrap:active { transform: scale(0.95); }
+
+.bunny-svg { width: 100%; height: 100%; }
+
+/* idle bounce */
+.bunny-body-g { animation: idleBounce 2.2s ease-in-out infinite; transform-origin: 50% 90%; }
+@keyframes idleBounce {
+  0%,100% { transform: translateY(0) rotate(0deg); }
+  25%      { transform: translateY(-6px) rotate(-1deg); }
+  75%      { transform: translateY(-3px) rotate(1deg); }
+}
+
+/* eat */
+.bunny-wrap.eating .bunny-body-g { animation: eatAnim 0.3s ease-in-out infinite; }
+@keyframes eatAnim {
+  0%,100% { transform: translateY(0) scaleY(1); }
+  50%      { transform: translateY(-3px) scaleY(0.95); }
+}
+
+/* play */
+.bunny-wrap.playing .bunny-body-g { animation: playAnim 0.4s ease-in-out infinite; }
+@keyframes playAnim {
+  0%   { transform: translateY(0) rotate(0deg); }
+  25%  { transform: translateY(-14px) rotate(-8deg); }
+  75%  { transform: translateY(-10px) rotate(8deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
+/* sleep */
+.bunny-wrap.sleeping .bunny-body-g { animation: sleepAnim 3s ease-in-out infinite; }
+@keyframes sleepAnim {
+  0%,100% { transform: rotate(0deg) translateY(0); }
+  50%      { transform: rotate(2deg) translateY(2px); }
+}
+
+/* sad */
+.bunny-wrap.sad .bunny-body-g { animation: sadAnim 3s ease-in-out infinite; }
+@keyframes sadAnim {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(3px); }
+}
+
+/* reaction popup */
+.reaction {
+  position: absolute; top: -10px; right: 10px;
+  font-size: 1.6rem;
+  animation: reactionPop 1.5s ease forwards;
+  pointer-events: none;
+}
+@keyframes reactionPop {
+  0%   { opacity:0; transform: scale(0.5) translateY(10px); }
+  20%  { opacity:1; transform: scale(1.2) translateY(-5px); }
+  60%  { opacity:1; transform: scale(1) translateY(0); }
+  100% { opacity:0; transform: scale(0.8) translateY(-20px); }
+}
+
+/* zzz for sleep */
+.zzz {
+  position: absolute; top: 0; right: 20px;
+  font-family: 'Playfair Display', serif;
+  font-style: italic; color: var(--pink2);
+  font-size: 1.2rem; opacity: 0;
+  animation: zzzFloat 2s ease-in-out infinite;
+}
+.zzz:nth-child(2) { right: 35px; font-size: 0.9rem; animation-delay: 0.6s; }
+.zzz:nth-child(3) { right: 50px; font-size: 0.7rem; animation-delay: 1.2s; }
+@keyframes zzzFloat {
+  0%   { opacity:0; transform:translateY(0); }
+  30%  { opacity:0.7; }
+  100% { opacity:0; transform:translateY(-40px); }
+}
+
+.bunny-msg {
+  font-family: 'Playfair Display', serif;
+  font-style: italic; font-size: 0.88rem;
+  color: var(--pink2); text-align: center;
+  margin-top: 6px; min-height: 24px;
+  transition: opacity 0.4s;
+}
+
+/* ── ACTION BUTTONS ── */
+.actions {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 10px; width: 100%; margin-bottom: 20px;
+}
+.act-btn {
+  background: var(--surface);
+  border: 1px solid rgba(244,167,192,0.15);
+  border-radius: var(--r-lg);
+  padding: 16px 10px;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 7px;
+  cursor: pointer; transition: all 0.25s;
+  color: var(--cream);
+  font-family: 'Cormorant Garamond', serif;
+}
+.act-btn:hover {
+  border-color: rgba(244,167,192,0.4);
+  background: var(--surface2);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.act-btn:active { transform: scale(0.96); }
+.act-btn .a-icon { font-size: 1.6rem; }
+.act-btn .a-label { font-size: 0.7rem; color: var(--muted); font-style: italic; }
+
+/* ── NAME CARD ── */
+.name-card {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid rgba(244,167,192,0.1);
+  border-radius: var(--r-xl);
+  padding: 20px 24px;
+  display: flex; align-items: center; gap: 14px;
+}
+.name-card-info { flex: 1; }
+.name-card-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem; font-style: italic;
+  color: var(--pink2);
+}
+.name-card-age {
+  font-size: 0.72rem; color: var(--muted);
+  font-style: italic; margin-top: 3px;
+}
+.name-edit {
+  background: none; border: 1px solid rgba(244,167,192,0.2);
+  color: var(--muted); padding: 6px 14px;
+  border-radius: 20px; font-family: 'Cormorant Garamond', serif;
+  font-size: 0.78rem; cursor: pointer; transition: all 0.2s;
+}
+.name-edit:hover { color: var(--pink); border-color: rgba(244,167,192,0.4); }
+
+/* ── RIBBON DECORATION ── */
+.ribbon {
+  font-size: 1.2rem;
+  animation: ribbonSway 3s ease-in-out infinite;
+  display: inline-block;
+}
+@keyframes ribbonSway {
+  0%,100% { transform: rotate(-8deg); }
+  50%      { transform: rotate(8deg); }
+}
+
+@media(max-width:480px){
+  .actions { gap: 8px; }
+  .act-btn { padding: 14px 8px; }
+  .act-btn .a-icon { font-size: 1.4rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- floating hearts -->
+<div class="hearts-bg" id="heartsBg"></div>
+
+<header class="topbar">
+  <a href="index.html" class="topbar-logo">Rincón de Lorena 🌹</a>
+  <nav class="topbar-nav">
+    <a href="biblioteca.html" class="nav-link">📚<span class="nav-text"> Libros</span></a>
+    <a href="videos.html"    class="nav-link">🎬<span class="nav-text"> Videos</span></a>
+    <a href="musica.html"    class="nav-link">🎵<span class="nav-text"> Música</span></a>
+    <a href="calendario.html" class="nav-link">📅<span class="nav-text"> Agenda</span></a>
+    <a href="diario.html"    class="nav-link">💭<span class="nav-text"> Diario</span></a>
+    <a href="album.html"     class="nav-link">🖼️<span class="nav-text"> Álbum</span></a>
+    <a href="mascota.html"   class="nav-link active">🐰<span class="nav-text"> Nesquik</span></a>
+    <a href="mascota.html" class="nav-link">🐰<span class="nav-text"> Nesquik</span></a>
+  </nav>
+</header>
+
+<div class="pet-page">
+  <p class="pet-title"><span class="ribbon">🎀</span> Mi Conejita <span class="ribbon">🎀</span></p>
+  <p class="pet-subtitle">cuídala con mucho amor ✨</p>
+
+  <!-- STATUS -->
+  <div class="status-card">
+    <div class="status-row">
+      <span class="status-icon">🍓</span>
+      <span class="status-label">Hambre</span>
+      <div class="bar-track"><div class="bar-fill bar-hambre" id="barHambre" style="width:80%"></div></div>
+      <span class="bar-val" id="valHambre">80</span>
+    </div>
+    <div class="status-row">
+      <span class="status-icon">💗</span>
+      <span class="status-label">Felicidad</span>
+      <div class="bar-track"><div class="bar-fill bar-feliz" id="barFeliz" style="width:80%"></div></div>
+      <span class="bar-val" id="valFeliz">80</span>
+    </div>
+    <div class="status-row">
+      <span class="status-icon">⚡</span>
+      <span class="status-label">Energía</span>
+      <div class="bar-track"><div class="bar-fill bar-energia" id="barEnergia" style="width:80%"></div></div>
+      <span class="bar-val" id="valEnergia">80</span>
+    </div>
+  </div>
+
+  <!-- BUNNY STAGE -->
+  <div class="stage">
+    <div class="state-label" id="stateLabel">descansando 🌸</div>
+    <div class="bunny-wrap" id="bunnyWrap" onclick="petBunny()">
+      <!-- ZZZ (hidden unless sleeping) -->
+      <span class="zzz" id="zzzEl" style="display:none">z</span>
+      <span class="zzz" style="display:none">z</span>
+      <span class="zzz" style="display:none">z</span>
+
+      <svg class="bunny-svg" viewBox="0 0 160 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g class="bunny-body-g" id="bunnyBodyG">
+
+          <!-- shadow -->
+          <ellipse cx="80" cy="188" rx="35" ry="6" fill="rgba(0,0,0,0.25)"/>
+
+          <!-- BODY -->
+          <ellipse cx="80" cy="148" rx="42" ry="44" fill="#fde8f2"/>
+          <!-- body shading -->
+          <ellipse cx="80" cy="148" rx="42" ry="44" fill="url(#bodyGrad)"/>
+
+          <!-- BELLY -->
+          <ellipse cx="80" cy="158" rx="24" ry="22" fill="#fff0f8"/>
+
+          <!-- LEFT EAR -->
+          <ellipse cx="54" cy="72" rx="14" ry="38" fill="#fde8f2" transform="rotate(-10 54 72)"/>
+          <ellipse cx="54" cy="72" rx="8"  ry="28" fill="#f4a7c0" transform="rotate(-10 54 72)"/>
+          <!-- ear ribbon -->
+          <ellipse cx="54" cy="50" rx="9" ry="5" fill="#e8648a" transform="rotate(-10 54 50)"/>
+          <ellipse cx="54" cy="50" rx="5" ry="3" fill="#f2a0bc" transform="rotate(-10 54 50)"/>
+
+          <!-- RIGHT EAR -->
+          <ellipse cx="106" cy="72" rx="14" ry="38" fill="#fde8f2" transform="rotate(10 106 72)"/>
+          <ellipse cx="106" cy="72" rx="8"  ry="28" fill="#f4a7c0" transform="rotate(10 106 72)"/>
+          <!-- ear ribbon -->
+          <ellipse cx="106" cy="50" rx="9" ry="5" fill="#e8648a" transform="rotate(10 106 50)"/>
+          <ellipse cx="106" cy="50" rx="5" ry="3" fill="#f2a0bc" transform="rotate(10 106 50)"/>
+
+          <!-- HEAD -->
+          <ellipse cx="80" cy="108" rx="36" ry="34" fill="#fde8f2"/>
+          <ellipse cx="80" cy="108" rx="36" ry="34" fill="url(#headGrad)"/>
+
+          <!-- CHEEK BLUSH -->
+          <ellipse cx="58" cy="118" rx="10" ry="6" fill="#f4a7c0" opacity="0.5"/>
+          <ellipse cx="102" cy="118" rx="10" ry="6" fill="#f4a7c0" opacity="0.5"/>
+
+          <!-- EYES (normal) -->
+          <g id="eyesNormal">
+            <ellipse cx="68" cy="106" rx="6" ry="7" fill="#2a1a28"/>
+            <ellipse cx="92" cy="106" rx="6" ry="7" fill="#2a1a28"/>
+            <!-- eye shine -->
+            <circle cx="70" cy="103" r="2" fill="white"/>
+            <circle cx="94" cy="103" r="2" fill="white"/>
+            <!-- lashes -->
+            <line x1="62" y1="99" x2="60" y2="96" stroke="#2a1a28" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="68" y1="98" x2="67" y2="95" stroke="#2a1a28" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="86" y1="98" x2="85" y2="95" stroke="#2a1a28" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="92" y1="99" x2="94" y2="96" stroke="#2a1a28" stroke-width="1.5" stroke-linecap="round"/>
+          </g>
+
+          <!-- EYES (sleeping) -->
+          <g id="eyesSleep" style="display:none">
+            <path d="M62 106 Q68 100 74 106" stroke="#2a1a28" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="M86 106 Q92 100 98 106" stroke="#2a1a28" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </g>
+
+          <!-- EYES (happy) -->
+          <g id="eyesHappy" style="display:none">
+            <path d="M62 108 Q68 101 74 108" stroke="#2a1a28" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <path d="M86 108 Q92 101 98 108" stroke="#2a1a28" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          </g>
+
+          <!-- EYES (sad) -->
+          <g id="eyesSad" style="display:none">
+            <ellipse cx="68" cy="108" rx="5" ry="6" fill="#2a1a28"/>
+            <ellipse cx="92" cy="108" rx="5" ry="6" fill="#2a1a28"/>
+            <circle cx="70" cy="106" r="1.5" fill="white"/>
+            <circle cx="94" cy="106" r="1.5" fill="white"/>
+            <!-- tear -->
+            <ellipse cx="65" cy="115" rx="2" ry="3" fill="#a0c8f0" opacity="0.8"/>
+          </g>
+
+          <!-- NOSE -->
+          <ellipse cx="80" cy="116" rx="4" ry="3" fill="#e8648a"/>
+          <!-- MOUTH -->
+          <path id="mouthNormal" d="M76 120 Q80 124 84 120" stroke="#c8607f" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <path id="mouthSad" d="M76 123 Q80 119 84 123" stroke="#c8607f" stroke-width="1.5" fill="none" stroke-linecap="round" style="display:none"/>
+
+          <!-- ARMS -->
+          <ellipse cx="46" cy="152" rx="12" ry="18" fill="#fde8f2" transform="rotate(15 46 152)"/>
+          <ellipse cx="114" cy="152" rx="12" ry="18" fill="#fde8f2" transform="rotate(-15 114 152)"/>
+
+          <!-- FEET -->
+          <ellipse cx="62"  cy="185" rx="18" ry="10" fill="#fde8f2"/>
+          <ellipse cx="98"  cy="185" rx="18" ry="10" fill="#fde8f2"/>
+
+          <!-- TAIL -->
+          <ellipse cx="120" cy="148" rx="12" ry="10" fill="#fff0f8"/>
+
+          <!-- BOW on body -->
+          <ellipse cx="80" cy="127" rx="12" ry="6" fill="#e8648a"/>
+          <ellipse cx="80" cy="127" rx="6"  ry="3" fill="#f2a0bc"/>
+          <circle  cx="80" cy="127" r="3"   fill="#e8648a"/>
+          <path d="M68 127 Q72 120 76 127" fill="#e8648a"/>
+          <path d="M84 127 Q88 120 92 127" fill="#e8648a"/>
+
+          <!-- ITEM (food/toy - hidden by default) -->
+          <g id="itemFood" style="display:none">
+            <circle cx="55" cy="165" r="8" fill="#f4a7c0"/>
+            <text x="50" y="170" font-size="12">🍓</text>
+          </g>
+          <g id="itemToy" style="display:none">
+            <text x="100" y="165" font-size="14">🎀</text>
+          </g>
+
+        </g>
+
+        <!-- gradients -->
+        <defs>
+          <radialGradient id="bodyGrad" cx="40%" cy="30%">
+            <stop offset="0%" stop-color="white" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#e8a0c0" stop-opacity="0.15"/>
+          </radialGradient>
+          <radialGradient id="headGrad" cx="40%" cy="30%">
+            <stop offset="0%" stop-color="white" stop-opacity="0.25"/>
+            <stop offset="100%" stop-color="#e8a0c0" stop-opacity="0.1"/>
+          </radialGradient>
+        </defs>
+      </svg>
+    </div>
+    <p class="bunny-msg" id="bunnyMsg">¡Hola! Soy Coco 🌸</p>
+    <div class="stage-floor"></div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="actions">
+    <button class="act-btn" onclick="feed()">
+      <span class="a-icon">🍓</span>
+      <span class="a-label">Alimentar</span>
+    </button>
+    <button class="act-btn" onclick="play()">
+      <span class="a-icon">🎀</span>
+      <span class="a-label">Jugar</span>
+    </button>
+    <button class="act-btn" onclick="sleep()">
+      <span class="a-icon">🌙</span>
+      <span class="a-label">Dormir</span>
+    </button>
+    <button class="act-btn" onclick="bath()">
+      <span class="a-icon">🛁</span>
+      <span class="a-label">Bañar</span>
+    </button>
+    <button class="act-btn" onclick="kiss()">
+      <span class="a-icon">💋</span>
+      <span class="a-label">Dar besito</span>
+    </button>
+    <button class="act-btn" onclick="dress()">
+      <span class="a-icon">👒</span>
+      <span class="a-label">Arreglar</span>
+    </button>
+  </div>
+
+  <!-- NAME CARD -->
+  <div class="name-card">
+    <span style="font-size:2rem">🐰</span>
+    <div class="name-card-info">
+      <div class="name-card-name" id="petNameDisplay">Coco</div>
+      <div class="name-card-age" id="petAgeDisplay">Cargando...</div>
+    </div>
+    <button class="name-edit" onclick="rename()">✏️ Renombrar</button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+const app = initializeApp({
+  apiKey:"AIzaSyA2YJXgAZAjOVqZ3eeTiMa9kCKaut_cA2w",
+  authDomain:"lore-basedatos.firebaseapp.com",
+  databaseURL:"https://lore-basedatos-default-rtdb.firebaseio.com",
+  projectId:"lore-basedatos",
+  storageBucket:"lore-basedatos.firebasestorage.app",
+  messagingSenderId:"348470598297",
+  appId:"1:348470598297:web:4634471f293f24a64fb608"
+});
+const db = getDatabase(app);
+
+// ── STATE ──
+let pet = {
+  name: 'Coco',
+  born: new Date().toISOString(),
+  hambre: 80,
+  feliz: 80,
+  energia: 80,
+  lastSeen: new Date().toISOString(),
+};
+
+// ── LOAD / SAVE ──
+async function loadPet(){
+  try{
+    const s = await get(ref(db, 'mascota'));
+    if(s.exists()) pet = {...pet, ...s.val()};
+  }catch{}
+  decayStats();
+  render();
+}
+async function savePet(){
+  pet.lastSeen = new Date().toISOString();
+  try{ await set(ref(db,'mascota'), pet); }catch{}
+}
+
+// ── DECAY — stats drop based on time away ──
+function decayStats(){
+  const now = new Date();
+  const last = new Date(pet.lastSeen);
+  const hoursAway = Math.min((now - last) / 3600000, 24);
+  pet.hambre  = Math.max(0, pet.hambre  - hoursAway * 4);
+  pet.feliz   = Math.max(0, pet.feliz   - hoursAway * 3);
+  pet.energia = Math.max(0, pet.energia - hoursAway * 2);
+}
+
+// ── RENDER ──
+function render(){
+  // bars
+  setBar('Hambre',  pet.hambre);
+  setBar('Feliz',   pet.feliz);
+  setBar('Energia', pet.energia);
+
+  // state
+  const wrap = document.getElementById('bunnyWrap');
+  wrap.className = 'bunny-wrap';
+  hideAllEyes();
+  document.getElementById('mouthNormal').style.display = '';
+  document.getElementById('mouthSad').style.display    = 'none';
+
+  const zzz = document.querySelectorAll('.zzz');
+
+  if(pet.energia < 20){
+    wrap.classList.add('sleeping');
+    showEyes('Sleep');
+    setMsg('Zzz... estoy muy cansada... 😴');
+    setLabel('durmiendo 💤');
+    zzz.forEach(z => z.style.display = '');
+  } else if(pet.hambre < 20){
+    wrap.classList.add('sad');
+    showEyes('Sad');
+    document.getElementById('mouthNormal').style.display = 'none';
+    document.getElementById('mouthSad').style.display    = '';
+    setMsg('Tengo mucha hambre... 🥺');
+    setLabel('hambrienta 🍓');
+    zzz.forEach(z => z.style.display = 'none');
+  } else if(pet.feliz < 20){
+    wrap.classList.add('sad');
+    showEyes('Sad');
+    document.getElementById('mouthNormal').style.display = 'none';
+    document.getElementById('mouthSad').style.display    = '';
+    setMsg('Me siento muy solita... 💔');
+    setLabel('tristita 💔');
+    zzz.forEach(z => z.style.display = 'none');
+  } else if(pet.hambre > 90 && pet.feliz > 90){
+    showEyes('Happy');
+    setMsg('¡Estoy feliz y bien alimentada! 🎀');
+    setLabel('muy feliz ✨');
+    zzz.forEach(z => z.style.display = 'none');
+  } else {
+    showEyes('Normal');
+    setMsg(idleMsg());
+    setLabel('descansando 🌸');
+    zzz.forEach(z => z.style.display = 'none');
+  }
+
+  // name & age
+  document.getElementById('petNameDisplay').textContent = pet.name;
+  const days = Math.floor((new Date() - new Date(pet.born)) / 864e5);
+  document.getElementById('petAgeDisplay').textContent = `${days === 0 ? 'Recién nacida' : `${days} día${days!==1?'s':''} de vida`} 🌸`;
+}
+
+function setBar(id, val){
+  const v = Math.round(Math.max(0,Math.min(100,val)));
+  document.getElementById('bar'+id).style.width = v+'%';
+  document.getElementById('val'+id).textContent  = v;
+}
+function hideAllEyes(){
+  ['Normal','Sleep','Happy','Sad'].forEach(n=>{
+    const el = document.getElementById('eyes'+n);
+    if(el) el.style.display='none';
+  });
+}
+function showEyes(n){ const el=document.getElementById('eyes'+n); if(el)el.style.display=''; }
+function setMsg(m){ document.getElementById('bunnyMsg').textContent=m; }
+function setLabel(l){ document.getElementById('stateLabel').textContent=l; }
+function idleMsg(){
+  const msgs=['¡Hola! 🌸','¿Me das un besito? 💋','Estoy muy cómoda aquí ✨',
+    '¡Mira qué bonito lazo tengo! 🎀','¿Jugamos? 🌷','Cuídame mucho, ¿sí? 💗'];
+  return msgs[Math.floor(Math.random()*msgs.length)];
+}
+
+// ── REACTION ──
+function react(emoji){
+  const wrap = document.getElementById('bunnyWrap');
+  const old = wrap.querySelector('.reaction');
+  if(old) old.remove();
+  const r = document.createElement('div');
+  r.className = 'reaction';
+  r.textContent = emoji;
+  wrap.appendChild(r);
+  setTimeout(()=>r.remove(), 1500);
+}
+
+// ── ACTIONS ──
+window.feed = function(){
+  if(pet.hambre >= 100){ setMsg('¡Ya comí bastante! 🐰'); return; }
+  pet.hambre  = Math.min(100, pet.hambre + 25);
+  pet.feliz   = Math.min(100, pet.feliz  + 5);
+  const wrap  = document.getElementById('bunnyWrap');
+  wrap.className='bunny-wrap eating';
+  setTimeout(()=>{ wrap.classList.remove('eating'); }, 1500);
+  react('🍓');
+  setMsg('¡Qué rica fresa! Gracias 🥰');
+  savePet(); render();
+}
+window.play = function(){
+  if(pet.energia < 15){ setMsg('Estoy muy cansada para jugar... 😴'); return; }
+  pet.feliz   = Math.min(100, pet.feliz   + 20);
+  pet.energia = Math.max(0,   pet.energia - 10);
+  const wrap  = document.getElementById('bunnyWrap');
+  wrap.className='bunny-wrap playing';
+  setTimeout(()=>{ wrap.classList.remove('playing'); }, 2000);
+  react('🎀');
+  setMsg('¡Yay! ¡Me encanta jugar contigo! 💃');
+  savePet(); render();
+}
+window.sleep = function(){
+  pet.energia = Math.min(100, pet.energia + 30);
+  react('💤');
+  setMsg('Mmm... qué rico descanso... 😴');
+  savePet(); render();
+}
+window.bath = function(){
+  pet.feliz = Math.min(100, pet.feliz + 10);
+  react('🛁');
+  setMsg('¡Qué rica el agua tibia! ✨');
+  savePet(); render();
+}
+window.kiss = function(){
+  pet.feliz = Math.min(100, pet.feliz + 15);
+  react('💋');
+  const msgs=['¡Eso me gustó mucho! 💗','¡Más besitos! 🥰','Te quiero mucho 💕'];
+  setMsg(msgs[Math.floor(Math.random()*msgs.length)]);
+  savePet(); render();
+}
+window.dress = function(){
+  pet.feliz = Math.min(100, pet.feliz + 12);
+  react('👑');
+  setMsg('¡Me veo hermosa! 🎀');
+  savePet(); render();
+}
+window.petBunny = function(){
+  pet.feliz = Math.min(100, pet.feliz + 8);
+  react('🌸');
+  setMsg('¡Gracias por acariciarme! 💗');
+  savePet(); render();
+}
+window.rename = function(){
+  const n = prompt(`¿Cómo se llamará tu conejita?\n(Actual: ${pet.name})`);
+  if(n && n.trim()){
+    pet.name = n.trim();
+    savePet(); render();
+  }
+}
+
+// ── HEARTS BACKGROUND ──
+function spawnHearts(){
+  const bg = document.getElementById('heartsBg');
+  const hearts = ['🌸','💗','✨','🎀','💕','🌷','💖'];
+  for(let i=0;i<18;i++){
+    const h = document.createElement('div');
+    h.className='hb';
+    h.textContent = hearts[Math.floor(Math.random()*hearts.length)];
+    h.style.left = Math.random()*100+'%';
+    h.style.bottom = '-30px';
+    h.style.animationDuration = (8+Math.random()*12)+'s';
+    h.style.animationDelay    = (Math.random()*8)+'s';
+    h.style.fontSize = (0.7+Math.random()*0.8)+'rem';
+    bg.appendChild(h);
+  }
+}
+spawnHearts();
+
+// ── PASSIVE DECAY every 30min ──
+setInterval(()=>{
+  pet.hambre  = Math.max(0, pet.hambre  - 2);
+  pet.feliz   = Math.max(0, pet.feliz   - 1.5);
+  pet.energia = Math.max(0, pet.energia - 1);
+  savePet(); render();
+}, 1800000);
+
+loadPet();
+</script>
+<script src="coco_widget.js"></script>
+</body>
+</html>
