@@ -4,12 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Wishlist — Rincón de Lorena</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="lore.css">
 <style>
-:root{--bg:#0d0810;--surface:#16101a;--surface2:#1e1525;--cream:#f5ede0;--muted:rgba(245,237,224,0.5);--rose:#d4789a;--deep-rose:#a0435a;--gold:#c9a84c;--soft-gold:rgba(201,168,76,0.12);--border:rgba(201,168,76,0.12);--border-rose:rgba(212,120,154,0.2);}
+:root{
+  --bg:#06040c;--surface:#110e1a;--surface2:#181425;--surface3:#201b30;
+  --cream:#f0e6d3;--muted:rgba(240,230,211,0.42);--muted2:rgba(240,230,211,0.22);
+  --rose:#c8607f;--rose2:#e07898;--deep-rose:#8a3050;
+  --gold:#b8942a;--gold2:#d4ae4a;
+  --soft-gold:rgba(184,148,42,0.08);--border:rgba(184,148,42,0.12);--border-rose:rgba(200,96,127,0.16);
+}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);font-family:'Cormorant Garamond',serif;color:var(--cream);min-height:100vh;overflow-x:hidden;}
-body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 70% 50% at 20% 10%,rgba(160,67,90,0.08) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 90% 90%,rgba(201,168,76,0.06) 0%,transparent 60%);}
+
 
 /* TOPBAR */
 .topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:rgba(13,8,16,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
@@ -103,6 +109,23 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 @keyframes pop{0%{transform:scale(1);}50%{transform:scale(1.08);}100%{transform:scale(1);}}
 .pop{animation:pop 0.35s ease;}
 @media(max-width:600px){.topbar-nav .nav-text{display:none;}.wish-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));}.stats{display:none;}}
+
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 80% 55% at -5% 0%,rgba(138,48,80,0.2) 0%,transparent 55%),
+  radial-gradient(ellipse 55% 45% at 105% 105%,rgba(184,148,42,0.09) 0%,transparent 55%);}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.4;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");}
+.page-body{animation:pgIn 0.45s ease;}@keyframes pgIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+::-webkit-scrollbar{width:3px;height:3px;}::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(184,148,42,0.2);border-radius:3px;}
+.topbar{background:rgba(6,4,12,0.92)!important;backdrop-filter:blur(28px) saturate(1.4)!important;}
+.topbar::after{content:'';position:absolute;bottom:0;left:5%;right:5%;height:1px;background:linear-gradient(90deg,transparent,rgba(184,148,42,0.12),transparent);}
+.page-header h1 em{background:linear-gradient(135deg,#e07898,#f09ab8)!important;-webkit-background-clip:text!important;-webkit-text-fill-color:transparent!important;background-clip:text!important;}
+.btn-save,.btn-add,.btn-action.primary,.btn-unlock{transition:all 0.25s!important;}
+.btn-save:hover,.btn-add:hover,.btn-action.primary:hover{transform:translateY(-2px)!important;box-shadow:0 8px 28px rgba(138,48,80,0.4)!important;}
+input:focus,textarea:focus{box-shadow:0 0 0 3px rgba(200,96,127,0.07)!important;}
+.song-card,.book-card,.video-card,.entry-card,.event-item,.carta-item,.grid-card,.photo-item{transition:all 0.25s!important;}
+
 </style>
 </head>
 <body>
@@ -134,7 +157,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
     <button class="filter-btn" onclick="setFilter('quiero',this)">💫 Quiero</button>
     <button class="filter-btn" onclick="setFilter('conseguido',this)">✅ Conseguido</button>
     <div class="filter-sep"></div>
-    <button class="filter-btn" onclick="setCat('',this)" id="catAll" style="display:none">Todas las categorías</button>
+    <button class="filter-btn" onclick="toggleCat('',this)" id="catAll" style="display:none">Todas las categorías</button>
     <span class="stats" id="statsText"></span>
   </div>
 
@@ -191,7 +214,22 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
   </div>
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyA2YJXgAZAjOVqZ3eeTiMa9kCKaut_cA2w",
+  authDomain: "lore-basedatos.firebaseapp.com",
+  databaseURL: "https://lore-basedatos-default-rtdb.firebaseio.com",
+  projectId: "lore-basedatos",
+  storageBucket: "lore-basedatos.firebasestorage.app",
+  messagingSenderId: "348470598297",
+  appId: "1:348470598297:web:4634471f293f24a64fb608"
+};
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const IMGBB_KEY = "3dec58925d383bab2caebdbb0e2f43e0";
+
 let items = [];
 let currentFilter = 'todo';
 let currentCat = '';
@@ -201,13 +239,13 @@ const CAT_EMOJI = {Ropa:'👗',Zapatos:'👠',Accesorios:'💍',Belleza:'💄',L
 
 async function load() {
   try {
-    const r = await window.storage.get('lorena_wishlist', true);
-    items = r ? JSON.parse(r.value) : [];
+    const snap = await get(ref(db, 'wishlist/items'));
+    items = snap.exists() ? snap.val() : [];
   } catch { items = []; }
   buildCatFilters();
   render();
 }
-async function save() { try { await window.storage.set('lorena_wishlist', JSON.stringify(items), true); } catch(e) { console.error('Error guardando:', e); } }
+async function save() { try { await set(ref(db, 'wishlist/items'), items); } catch(e) { console.error('Error guardando:', e); } }
 
 function buildCatFilters() {
   const bar = document.getElementById('filtersBar');
@@ -232,14 +270,14 @@ function buildCatFilters() {
   document.getElementById('statsText').textContent = items.length ? `${quiero} pendiente${quiero!==1?'s':''} · ${conseguido} conseguido${conseguido!==1?'s':''}` : '';
 }
 
-function setFilter(f, el) {
+window.setFilter = function(f, el) {
   currentFilter = f;
   document.querySelectorAll('.filter-btn').forEach(b => { if (!b.classList.contains('cat-filter')) b.classList.remove('active'); });
   el.classList.add('active');
   render();
 }
 
-function toggleCat(cat, el) {
+window.toggleCat = function(cat, el) {
   currentCat = currentCat === cat ? '' : cat;
   document.querySelectorAll('.cat-filter.filter-btn').forEach(b => b.classList.remove('active'));
   if (currentCat) el.classList.add('active');
@@ -283,7 +321,7 @@ function render() {
   }).join('');
 }
 
-function toggleEstado(id) {
+window.toggleEstado = function(id) {
   const item = items.find(i => i.id === id);
   if (!item) return;
   item.estado = item.estado === 'conseguido' ? 'quiero' : 'conseguido';
@@ -297,7 +335,7 @@ function toggleEstado(id) {
   }, 50);
 }
 
-function eliminar(id) {
+window.eliminar = function(id) {
   if (!confirm('¿Eliminar este item?')) return;
   items = items.filter(i => i.id !== id);
   save(); buildCatFilters(); render();
@@ -307,11 +345,11 @@ function eliminar(id) {
 let imgMode = 'url';
 let pendingImgData = '';
 
-function openModal() {
+window.openModal = function() {
   document.getElementById('modalOverlay').classList.add('active');
   setTimeout(() => document.getElementById('nameInput').focus(), 100);
 }
-function closeModal() {
+window.closeModal = function() {
   document.getElementById('modalOverlay').classList.remove('active');
   ['nameInput','precioInput','linkInput','imgUrlInput','notaInput'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('imgFileInput').value = '';
@@ -320,7 +358,7 @@ function closeModal() {
   pendingImgData = '';
 }
 
-function switchImgTab(mode, el) {
+window.switchImgTab = function(mode, el) {
   imgMode = mode;
   document.querySelectorAll('.img-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
@@ -330,19 +368,19 @@ function switchImgTab(mode, el) {
   pendingImgData = '';
 }
 
-function previewImgUrl() {
+window.previewImgUrl = function() {
   const url = document.getElementById('imgUrlInput').value.trim();
   const preview = document.getElementById('imgPreview');
   if (url) { preview.src = url; preview.classList.add('visible'); pendingImgData = url; }
   else { preview.classList.remove('visible'); pendingImgData = ''; }
 }
 
-function previewImgFile() {
+window.previewImgFile = function() {
   const file = document.getElementById('imgFileInput').files[0];
   if (!file) return;
   const reader = new FileReader();
   reader.onload = e => {
-    pendingImgData = e.target.result;
+    pendingImgData = e.target.result; // base64 temporal para preview
     const preview = document.getElementById('imgPreview');
     preview.src = pendingImgData;
     preview.classList.add('visible');
@@ -350,22 +388,54 @@ function previewImgFile() {
   reader.readAsDataURL(file);
 }
 
-function guardar() {
+async function uploadToImgBB(base64data) {
+  const base64 = base64data.split(',')[1];
+  const formData = new FormData();
+  formData.append('image', base64);
+  const res = await fetch(`https://api.imgbb.com/1/upload?key=3dec58925d383bab2caebdbb0e2f43e0`, {
+    method: 'POST',
+    body: formData
+  });
+  const json = await res.json();
+  if (json.success) return json.data.url;
+  throw new Error('ImgBB error');
+}
+
+window.guardar = async function() {
   const name = document.getElementById('nameInput').value.trim();
   if (!name) { document.getElementById('nameInput').style.borderColor = 'var(--rose)'; document.getElementById('nameInput').focus(); return; }
   document.getElementById('nameInput').style.borderColor = '';
+
+  let imgFinal = imgMode === 'url' ? document.getElementById('imgUrlInput').value.trim() : '';
+
+  // Si hay una imagen subida (base64), subirla a ImgBB
+  if (pendingImgData && pendingImgData.startsWith('data:')) {
+    const btnG = document.querySelector('.btn-save');
+    if (btnG) { btnG.textContent = 'Subiendo imagen... ⏳'; btnG.disabled = true; }
+    try {
+      imgFinal = await uploadToImgBB(pendingImgData);
+    } catch(e) {
+      alert('Error subiendo la imagen. Intenta de nuevo 🌸');
+      if (btnG) { btnG.textContent = 'Guardar ✨'; btnG.disabled = false; }
+      return;
+    }
+    if (btnG) { btnG.textContent = 'Guardar ✨'; btnG.disabled = false; }
+  } else if (pendingImgData) {
+    imgFinal = pendingImgData;
+  }
+
   items.unshift({
     id: Date.now() + '' + Math.floor(Math.random()*1000),
     name,
     cat: document.getElementById('catInput').value,
     precio: document.getElementById('precioInput').value.trim(),
     link: document.getElementById('linkInput').value.trim(),
-    img: pendingImgData || (imgMode==='url' ? document.getElementById('imgUrlInput').value.trim() : ''),
+    img: imgFinal,
     nota: document.getElementById('notaInput').value.trim(),
     estado: 'quiero',
     fecha: new Date().toISOString()
   });
-  save(); buildCatFilters(); closeModal(); render();
+  await save(); buildCatFilters(); closeModal(); render();
 }
 
 document.getElementById('nameInput').addEventListener('keydown', e => { if (e.key === 'Enter') guardar(); });
