@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>💝 Sorpresa para Lorena</title>
+<link rel="stylesheet" href="lore.css">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&display=swap" rel="stylesheet">
+<style>
+
+/* ── PAGE ── */
+.page-wrap {
+  position: relative; z-index: 2;
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center;
+  padding: 80px 20px 120px;
+  gap: 0;
+}
+
+/* ── SURPRISE BUTTON ── */
+.surprise-zone {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 28px;
+  margin-bottom: 10px;
+}
+
+.surprise-hint {
+  font-size: 0.68rem; letter-spacing: 0.30em;
+  text-transform: uppercase; color: var(--muted2);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+
+/* THE BUTTON */
+.btn-sorpresa {
+  position: relative;
+  cursor: pointer;
+  border: none; background: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-sorpresa-inner {
+  position: relative;
+  width: 220px; height: 220px;
+  border-radius: 50%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 8px;
+  background: radial-gradient(circle at 38% 35%,
+    rgba(200,96,127,0.35) 0%,
+    rgba(138,48,80,0.55) 40%,
+    rgba(100,30,60,0.85) 100%
+  );
+  border: 2px solid rgba(200,96,127,0.35);
+  box-shadow:
+    0 0 0 8px rgba(200,96,127,0.06),
+    0 0 0 20px rgba(200,96,127,0.03),
+    0 0 60px rgba(200,96,127,0.3),
+    0 20px 80px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.12);
+  transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1),
+              box-shadow 0.25s ease;
+  animation: breathe 3s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%,100% { box-shadow: 0 0 0 8px rgba(200,96,127,0.06), 0 0 0 20px rgba(200,96,127,0.03), 0 0 60px rgba(200,96,127,0.3), 0 20px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.12); }
+  50%      { box-shadow: 0 0 0 14px rgba(200,96,127,0.09), 0 0 0 32px rgba(200,96,127,0.04), 0 0 90px rgba(200,96,127,0.45), 0 20px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.12); }
+}
+
+.btn-sorpresa:hover .btn-sorpresa-inner {
+  transform: scale(1.07);
+  box-shadow:
+    0 0 0 16px rgba(200,96,127,0.10),
+    0 0 0 36px rgba(200,96,127,0.05),
+    0 0 110px rgba(200,96,127,0.55),
+    0 30px 100px rgba(0,0,0,0.7),
+    inset 0 1px 0 rgba(255,255,255,0.15);
+  animation: none;
+}
+
+.btn-sorpresa:active .btn-sorpresa-inner {
+  transform: scale(0.95);
+}
+
+/* Sparkle ring */
+.btn-sorpresa-inner::before {
+  content: '';
+  position: absolute; inset: -14px;
+  border-radius: 50%;
+  background: conic-gradient(
+    rgba(200,96,127,0) 0deg,
+    rgba(200,96,127,0.6) 60deg,
+    rgba(212,174,74,0.8) 120deg,
+    rgba(200,96,127,0) 180deg,
+    rgba(240,154,184,0.6) 240deg,
+    rgba(212,174,74,0.5) 300deg,
+    rgba(200,96,127,0) 360deg
+  );
+  animation: ring-spin 4s linear infinite;
+  mask: radial-gradient(circle, transparent 58%, black 62%, black 65%, transparent 70%);
+  -webkit-mask: radial-gradient(circle, transparent 58%, black 62%, black 65%, transparent 70%);
+}
+@keyframes ring-spin { to { transform: rotate(360deg); } }
+
+.btn-emoji {
+  font-size: 4rem;
+  filter: drop-shadow(0 0 20px rgba(200,96,127,0.8));
+  animation: float 2.5s ease-in-out infinite;
+  line-height: 1;
+}
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+.btn-label {
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.3rem; font-weight: 700;
+  background: linear-gradient(135deg, #f09ab8, #eed080, #f09ab8);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  text-shadow: none;
+  line-height: 1.2; text-align: center;
+}
+
+/* Orbiting stars */
+.orbit {
+  position: absolute; inset: -30px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.star {
+  position: absolute;
+  font-size: 1rem;
+  top: 50%; left: 50%;
+  transform-origin: 0 0;
+}
+.s1 { animation: orb1 6s linear infinite; }
+.s2 { animation: orb1 6s linear infinite -2s; }
+.s3 { animation: orb1 6s linear infinite -4s; }
+@keyframes orb1 {
+  from { transform: rotate(0deg) translateX(130px) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(130px) rotate(-360deg); }
+}
+
+/* ── EXPLOSION OVERLAY ── */
+#explosion {
+  display: none;
+  position: fixed; inset: 0; z-index: 500;
+  pointer-events: none;
+  overflow: hidden;
+}
+#explosion.active { display: block; }
+.confetti-piece {
+  position: absolute;
+  top: -20px;
+  border-radius: 2px;
+  animation: fall linear forwards;
+}
+@keyframes fall {
+  to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+
+/* ── CONTENT (hidden until reveal) ── */
+#contenido {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  width: 100%; max-width: 680px;
+  gap: 0;
+  animation: revealAll 0.8s ease forwards;
+}
+#contenido.visible { display: flex; }
+@keyframes revealAll {
+  from { opacity:0; transform: translateY(30px) scale(0.97); }
+  to   { opacity:1; transform: translateY(0) scale(1); }
+}
+
+/* ── HEADER CELEBRACIÓN ── */
+.celeb-header {
+  text-align: center;
+  padding: 0 16px 10px;
+}
+
+.celeb-tag {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: linear-gradient(135deg, rgba(200,96,127,0.15), rgba(212,174,74,0.10));
+  border: 1px solid rgba(200,96,127,0.25);
+  border-radius: 50px;
+  padding: 8px 20px;
+  font-size: 0.65rem; letter-spacing: 0.28em;
+  text-transform: uppercase; color: var(--rose3);
+  margin-bottom: 24px;
+}
+
+.celeb-title {
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(2.8rem, 10vw, 5rem);
+  font-weight: 700;
+  background: linear-gradient(135deg, #f09ab8 0%, #eed080 45%, #f09ab8 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  line-height: 1.15;
+  animation: shimmer 4s ease infinite;
+  margin-bottom: 6px;
+}
+@keyframes shimmer {
+  0%,100% { background-position: 0% 50%; }
+  50%     { background-position: 100% 50%; }
+}
+
+.celeb-sub {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: clamp(1rem, 3vw, 1.35rem);
+  color: var(--cream2);
+  margin-top: 6px;
+  opacity: 0.85;
+}
+
+/* ── ANNIVERSARY BANNER ── */
+.aniv-banner {
+  width: 100%;
+  background: linear-gradient(135deg,
+    rgba(138,48,80,0.2) 0%,
+    rgba(184,148,42,0.1) 50%,
+    rgba(138,48,80,0.2) 100%
+  );
+  border: 1px solid rgba(200,96,127,0.2);
+  border-radius: 24px;
+  padding: 30px 28px;
+  text-align: center;
+  position: relative; overflow: hidden;
+  margin: 28px 0;
+}
+.aniv-banner::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% -20%, rgba(200,96,127,0.12), transparent 60%);
+}
+.aniv-num {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(3.5rem, 12vw, 6rem);
+  line-height: 1;
+  background: linear-gradient(135deg, var(--rose2), var(--gold2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  font-weight: 700;
+}
+.aniv-label {
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(1.2rem, 4vw, 1.8rem);
+  color: var(--cream);
+  margin-top: 4px;
+}
+.aniv-fecha {
+  font-size: 0.7rem; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--muted);
+  margin-top: 10px;
+}
+.aniv-hearts {
+  display: flex; justify-content: center; gap: 8px;
+  margin-top: 14px;
+  font-size: 1.4rem;
+}
+.aniv-hearts span {
+  animation: heartbeat 1.3s ease-in-out infinite;
+}
+.aniv-hearts span:nth-child(2) { animation-delay: 0.15s; }
+.aniv-hearts span:nth-child(3) { animation-delay: 0.3s; }
+.aniv-hearts span:nth-child(4) { animation-delay: 0.15s; }
+.aniv-hearts span:nth-child(5) { animation-delay: 0s; }
+@keyframes heartbeat {
+  0%,100% { transform: scale(1); }
+  30%     { transform: scale(1.3); }
+}
+
+/* ── DÍA DE LA MUJER ── */
+.mujer-section {
+  width: 100%;
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  margin: 0 0 28px;
+}
+.mujer-bg {
+  background: linear-gradient(160deg,
+    rgba(60,20,100,0.5) 0%,
+    rgba(138,48,80,0.4) 40%,
+    rgba(200,96,127,0.2) 100%
+  );
+  border: 1px solid rgba(200,96,127,0.22);
+  border-radius: 24px;
+  padding: 32px 28px 28px;
+  text-align: center;
+  position: relative;
+}
+.mujer-bg::after {
+  content: '♀';
+  position: absolute; right: 16px; top: 10px;
+  font-size: 6rem; opacity: 0.04;
+  color: var(--rose3);
+  line-height: 1;
+}
+.mujer-icon {
+  font-size: 3rem;
+  filter: drop-shadow(0 0 20px rgba(200,96,127,0.7));
+  margin-bottom: 12px;
+  display: block;
+  animation: float 3s ease-in-out infinite;
+}
+.mujer-titulo {
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(1.6rem, 6vw, 2.5rem);
+  font-weight: 700;
+  background: linear-gradient(135deg, #e07898, #eed080, #c8607f);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 14px;
+}
+.mujer-texto {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+  color: var(--cream2);
+  line-height: 1.8;
+  max-width: 480px; margin: 0 auto;
+}
+.mujer-firma {
+  margin-top: 16px;
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.1rem;
+  color: var(--rose3);
+}
+
+/* ── CUPONES ── */
+.cupones-title {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--gold2);
+  text-align: center;
+  letter-spacing: 0.06em;
+  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 12px;
+}
+.cupones-title::before, .cupones-title::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212,174,74,0.25));
+}
+.cupones-title::after { background: linear-gradient(90deg, rgba(212,174,74,0.25), transparent); }
+
+.cupones-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+/* THE COUPON */
+.cupon {
+  position: relative;
+  border-radius: 20px;
+  overflow: visible;
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.cupon:hover { transform: translateY(-6px) rotate(-1deg); }
+.cupon:nth-child(even):hover { transform: translateY(-6px) rotate(1deg); }
+
+.cupon-inner {
+  background: var(--surface);
+  border: 1px dashed rgba(200,96,127,0.4);
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Perforation effect */
+.cupon-inner::before {
+  content: '';
+  position: absolute; left: 0; right: 0; top: 62%;
+  height: 1px;
+  background: repeating-linear-gradient(90deg,
+    transparent, transparent 6px,
+    rgba(200,96,127,0.25) 6px, rgba(200,96,127,0.25) 12px
+  );
+}
+
+/* Circles on sides (ticket punch) */
+.cupon-punch-l, .cupon-punch-r {
+  position: absolute;
+  top: 62%; transform: translateY(-50%);
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px dashed rgba(200,96,127,0.3);
+  z-index: 2;
+}
+.cupon-punch-l { left: -8px; }
+.cupon-punch-r { right: -8px; }
+
+.cupon-top {
+  padding: 20px 16px 14px;
+  text-align: center;
+  background: linear-gradient(160deg, rgba(138,48,80,0.15), rgba(100,20,60,0.25));
+}
+.cupon-emoji { font-size: 2.4rem; display: block; margin-bottom: 6px; }
+.cupon-vale  {
+  font-size: 0.55rem; letter-spacing: 0.28em;
+  text-transform: uppercase; color: var(--muted);
+  margin-bottom: 4px;
+}
+.cupon-desc {
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(1rem, 3.5vw, 1.3rem);
+  font-weight: 700;
+  color: var(--cream);
+  line-height: 1.3;
+}
+
+.cupon-bottom {
+  padding: 10px 16px 14px;
+  text-align: center;
+}
+.cupon-canje {
+  font-size: 0.6rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--gold2);
+  opacity: 0.7;
+}
+
+/* Stamp when used */
+.cupon.usado .cupon-inner::after {
+  content: '✓ CANJEADO';
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem; font-style: italic;
+  color: rgba(200,96,127,0.55);
+  background: rgba(6,4,12,0.7);
+  border: 3px solid rgba(200,96,127,0.3);
+  border-radius: 20px;
+  letter-spacing: 0.1em;
+  transform: rotate(-8deg);
+}
+
+/* Glow colors per coupon */
+.cupon:nth-child(1) .cupon-inner { border-color: rgba(200,96,127,0.4); }
+.cupon:nth-child(2) .cupon-inner { border-color: rgba(212,174,74,0.4); }
+.cupon:nth-child(3) .cupon-inner { border-color: rgba(240,154,184,0.4); }
+.cupon:nth-child(4) .cupon-inner { border-color: rgba(138,48,80,0.5); }
+.cupon:nth-child(5) .cupon-inner { border-color: rgba(184,148,42,0.4); }
+.cupon:nth-child(6) .cupon-inner { border-color: rgba(200,96,127,0.35); }
+
+/* ── MODAL CUPON ── */
+#cuponModal {
+  display: none;
+  position: fixed; inset: 0; z-index: 600;
+  background: rgba(6,4,12,0.88);
+  backdrop-filter: blur(20px);
+  align-items: center; justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+#cuponModal.open { display: flex; }
+
+.cupon-modal-box {
+  background: var(--surface);
+  border-radius: 28px;
+  border: 1px solid rgba(200,96,127,0.25);
+  max-width: 360px; width: 100%;
+  overflow: hidden;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.7), 0 0 80px rgba(200,96,127,0.1);
+  animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+@keyframes popIn {
+  from { opacity:0; transform: scale(0.7) translateY(30px); }
+  to   { opacity:1; transform: scale(1) translateY(0); }
+}
+
+.cm-header {
+  background: linear-gradient(160deg, rgba(138,48,80,0.3), rgba(100,20,80,0.4));
+  padding: 36px 28px 24px;
+  text-align: center;
+  position: relative;
+  border-bottom: 1px dashed rgba(200,96,127,0.2);
+}
+.cm-emoji { font-size: 5rem; display: block; margin-bottom: 8px; }
+.cm-vale  {
+  font-size: 0.58rem; letter-spacing: 0.3em;
+  text-transform: uppercase; color: var(--muted);
+  margin-bottom: 8px;
+}
+.cm-nombre {
+  font-family: 'Dancing Script', cursive;
+  font-size: 2rem; font-weight: 700;
+  color: var(--cream);
+  line-height: 1.2;
+}
+.cm-body {
+  padding: 24px 28px;
+  text-align: center;
+}
+.cm-para {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 0.95rem; color: var(--cream2);
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+.cm-nota {
+  font-size: 0.62rem; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--gold2);
+  opacity: 0.7;
+  border: 1px solid rgba(212,174,74,0.15);
+  border-radius: 8px; padding: 8px 14px;
+  display: inline-block; margin-bottom: 20px;
+}
+.cm-btns {
+  display: flex; gap: 10px; justify-content: center;
+}
+.cm-btn {
+  padding: 12px 22px;
+  border: none; border-radius: 50px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.88rem; letter-spacing: 0.05em;
+  cursor: pointer; transition: all 0.25s;
+}
+.cm-btn-use {
+  background: linear-gradient(135deg, var(--deep-rose), rgba(138,48,80,0.8));
+  color: var(--cream);
+  border: 1px solid rgba(200,96,127,0.3);
+}
+.cm-btn-use:hover { background: linear-gradient(135deg, var(--rose), var(--deep-rose)); transform: scale(1.04); }
+.cm-btn-close {
+  background: var(--surface2);
+  color: var(--muted);
+  border: 1px solid var(--border2);
+}
+.cm-btn-close:hover { color: var(--cream2); }
+
+/* ── BACK BTN ── */
+.back-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  text-decoration: none;
+  font-size: 0.7rem; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--muted);
+  padding: 12px 20px;
+  border: 1px solid var(--border2);
+  border-radius: 50px;
+  transition: all 0.25s;
+  margin-top: 20px;
+}
+.back-btn:hover { color: var(--cream2); border-color: var(--border-rose); }
+
+/* ── RESPONSIVE ── */
+@media(max-width: 480px) {
+  .cupones-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .cupon-desc { font-size: 0.9rem; }
+  .btn-sorpresa-inner { width: 180px; height: 180px; }
+  .btn-emoji { font-size: 3.2rem; }
+  .s1,.s2,.s3 { display:none; }
+}
+@media(max-width: 340px) {
+  .cupones-grid { grid-template-columns: 1fr; }
+}
+
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+</style>
+</head>
+<body>
+
+<canvas id="petals"></canvas>
+
+<header class="topbar">
+  <a href="index.html" class="topbar-logo">Rincón de Lorena 🌹</a>
+</header>
+
+<!-- CONFETTI EXPLOSION -->
+<div id="explosion"></div>
+
+<div class="page-wrap">
+
+  <!-- === SURPRISE BUTTON === -->
+  <div class="surprise-zone" id="surpriseZone">
+    <div class="surprise-hint">✦ Toca para abrir tu sorpresa ✦</div>
+
+    <button class="btn-sorpresa" id="btnSorpresa" onclick="revelarSorpresa()">
+      <div class="btn-sorpresa-inner">
+        <div class="orbit">
+          <span class="star s1">✦</span>
+          <span class="star s2">🌸</span>
+          <span class="star s3">✦</span>
+        </div>
+        <span class="btn-emoji">🎁</span>
+        <span class="btn-label">¡Toca aquí<br>Lorena!</span>
+      </div>
+    </button>
+
+    <div class="surprise-hint" style="margin-top:8px;">💝 Una sorpresa especial para ti 💝</div>
+  </div>
+
+  <!-- === CONTENT (revealed on click) === -->
+  <div id="contenido">
+
+    <!-- Header -->
+    <div class="celeb-header">
+      <div class="celeb-tag">💝 Solo para ti, Lorena 💝</div>
+      <h1 class="celeb-title">¡Feliz 1 Año<br>y 2 Meses, mi amor!</h1>
+      <p class="celeb-sub">Cada día contigo es el mejor día de mi vida 🌹</p>
+    </div>
+
+    <!-- Aniversario banner -->
+    <div class="aniv-banner">
+      <div class="aniv-num">1 año<br><span style="font-size:0.6em; opacity:0.7">&</span><br>2 meses</div>
+      <div class="aniv-label">juntos tú y yo 💕</div>
+      <div class="aniv-fecha">✦ Y los que faltan ✦</div>
+      <div class="aniv-hearts">
+        <span>🌹</span><span>💝</span><span>❤️</span><span>💝</span><span>🌹</span>
+      </div>
+    </div>
+
+    <!-- Día de la Mujer -->
+    <div class="mujer-section">
+      <div class="mujer-bg">
+        <span class="mujer-icon">👑</span>
+        <div class="mujer-titulo">Feliz Día de la Mujer,<br>Lorena</div>
+        <p class="mujer-texto">
+          Hoy celebramos a la mujer más hermosa, inteligente y especial de mi vida.
+          Eres fuerza, eres luz, eres todo. Me haces mejor persona cada día que pasa
+          y me siento el hombre más afortunado del mundo por tenerte.
+          ¡Hoy y siempre, este día es tuyo! 🌸
+        </p>
+        <div class="mujer-firma">Con todo mi amor, siempre 🌹</div>
+      </div>
+    </div>
+
+    <!-- Cupones -->
+    <div style="width:100%">
+      <div class="cupones-title">Tus cupones de amor</div>
+      <div class="cupones-grid" id="cuponesGrid"></div>
+    </div>
+
+    <a href="index.html" class="back-btn">← Volver a tu rincón</a>
+
+  </div><!-- /contenido -->
+
+</div><!-- /page-wrap -->
+
+<!-- MODAL CUPÓN -->
+<div id="cuponModal">
+  <div class="cupon-modal-box">
+    <div class="cm-header">
+      <span class="cm-emoji" id="cmEmoji"></span>
+      <div class="cm-vale">Vale por</div>
+      <div class="cm-nombre" id="cmNombre"></div>
+    </div>
+    <div class="cm-body">
+      <p class="cm-para" id="cmDesc"></p>
+      <div class="cm-nota" id="cmNota"></div>
+      <div class="cm-btns">
+        <button class="cm-btn cm-btn-use" id="cmBtnUsar" onclick="usarCupon()">Canjear ahora 💝</button>
+        <button class="cm-btn cm-btn-close" onclick="cerrarModal()">Guardar para después</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="coco_widget.js"></script>
+<script>
+/* ── PETALS ── */
+const cv = document.getElementById('petals');
+const cx = cv.getContext('2d');
+let pts = [], pActive = true;
+function resz(){ cv.width=innerWidth; cv.height=innerHeight; }
+resz(); addEventListener('resize',resz);
+function mkP(){
+  const cols=['#c8607f','#b8942a','#e07898','#d4ae4a','#a04060','#f09ab8','#8a3050'];
+  return { x:Math.random()*cv.width, y:-25, sz:Math.random()*9+5,
+    vy:Math.random()*1.1+0.4, vx:(Math.random()-.5)*.9,
+    rot:Math.random()*Math.PI*2, drot:(Math.random()-.5)*.05,
+    op:Math.random()*.4+.18, col:cols[Math.floor(Math.random()*cols.length)],
+    w:Math.random()*Math.PI*2, dw:Math.random()*.025+.007 };
+}
+function drawP(p){
+  cx.save(); cx.translate(p.x,p.y); cx.rotate(p.rot);
+  cx.globalAlpha=p.op; cx.fillStyle=p.col;
+  cx.beginPath(); cx.ellipse(0,0,p.sz*.4,p.sz,0,0,Math.PI*2);
+  cx.fill(); cx.restore();
+}
+function loop(){
+  cx.clearRect(0,0,cv.width,cv.height);
+  if(pActive && pts.length<40 && Math.random()<.12) pts.push(mkP());
+  pts=pts.filter(p=>p.y<cv.height+30&&p.op>.01);
+  pts.forEach(p=>{
+    p.y+=p.vy; p.w+=p.dw; p.x+=p.vx+Math.sin(p.w)*.5;
+    p.rot+=p.drot; if(!pActive)p.op*=.993;
+    drawP(p);
+  });
+  requestAnimationFrame(loop);
+}
+loop();
+
+/* ── CUPONES DATA ── */
+const cupones = [
+  {
+    emoji: '💋',
+    titulo: '1 Besote Gratis',
+    desc: 'Vale por un besote tamaño familiar, con todo el amor del mundo, cuando tú quieras.',
+    nota: 'Sin fecha de vencimiento · Válido siempre',
+    extra: 'Canjealo cuando más lo necesites o cuando simplemente se te antoje 😘',
+  },
+  {
+    emoji: '🍦',
+    titulo: 'Helado Juntos',
+    desc: 'Vale por una salida a comer helado, tú eliges el sabor, el lugar y el momento.',
+    nota: 'Incluye el tuyo y el mío 🍦',
+    extra: 'Capricho de helado cuando quieras, yo invito con todo el gusto.',
+  },
+  {
+    emoji: '🤗',
+    titulo: '1 Abrazo Infinito',
+    desc: 'Vale por un abrazo que dura lo que tú quieras. Sin límite de tiempo. Solo tú y yo.',
+    nota: 'Se puede usar en cualquier momento del día',
+    extra: 'Para esos días donde todo se siente pesado, aquí estoy para apretarte fuerte.',
+  },
+  {
+    emoji: '🌹',
+    titulo: 'Tu Noche Especial',
+    desc: 'Vale por una noche solo para ti: tú eliges la peli, la cena y el plan. Sin discusión.',
+    nota: '100% a tu gusto · Tú mandas esa noche',
+    extra: 'Tu eliges todo: la peli, la comida, si salimos o nos quedamos. ¡Esa noche es tuya!',
+  },
+  {
+    emoji: '✨',
+    titulo: 'Te Lo Mereces',
+    desc: 'Vale por un masaje en los pies o la espalda, cuando estés cansada. Con todo el amor.',
+    nota: 'Para cuando más lo necesites',
+    extra: 'Después de un día largo, un masaje de tu novio sin pedir nada a cambio 💆‍♀️',
+  },
+  {
+    emoji: '🎂',
+    titulo: 'Postre Especial',
+    desc: 'Vale por tu postre favorito, hecho en casa o traído de donde tú elijas. Solo porque sí.',
+    nota: 'Porque te lo mereces sin motivo',
+    extra: 'Dime qué postre se te antoja y yo lo consigo. Así de simple, así de rico. 🍰',
+  },
+];
+
+let cuponActual = -1;
+const usados = JSON.parse(localStorage.getItem('cupones_usados') || '[]');
+
+function renderCupones(){
+  const grid = document.getElementById('cuponesGrid');
+  grid.innerHTML = cupones.map((c, i) => `
+    <div class="cupon ${usados.includes(i) ? 'usado' : ''}" onclick="abrirCupon(${i})">
+      <div class="cupon-punch-l"></div>
+      <div class="cupon-punch-r"></div>
+      <div class="cupon-inner">
+        <div class="cupon-top">
+          <span class="cupon-emoji">${c.emoji}</span>
+          <div class="cupon-vale">Vale por</div>
+          <div class="cupon-desc">${c.titulo}</div>
+        </div>
+        <div class="cupon-bottom">
+          <div class="cupon-canje">${usados.includes(i) ? '✓ Ya canjeado' : '↓ Toca para canjear'}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function abrirCupon(i){
+  cuponActual = i;
+  const c = cupones[i];
+  document.getElementById('cmEmoji').textContent = c.emoji;
+  document.getElementById('cmNombre').textContent = c.titulo;
+  document.getElementById('cmDesc').textContent = c.extra;
+  document.getElementById('cmNota').textContent = c.nota;
+  const btnUsar = document.getElementById('cmBtnUsar');
+  btnUsar.textContent = usados.includes(i) ? '✓ Ya fue canjeado 💝' : 'Canjear ahora 💝';
+  btnUsar.disabled = usados.includes(i);
+  btnUsar.style.opacity = usados.includes(i) ? '0.5' : '1';
+  document.getElementById('cuponModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function usarCupon(){
+  if(cuponActual < 0) return;
+  if(!usados.includes(cuponActual)){
+    usados.push(cuponActual);
+    localStorage.setItem('cupones_usados', JSON.stringify(usados));
+  }
+  cerrarModal();
+  renderCupones();
+  lanzarConfetti(30);
+}
+
+function cerrarModal(){
+  document.getElementById('cuponModal').classList.remove('open');
+  document.body.style.overflow = '';
+  cuponActual = -1;
+}
+document.getElementById('cuponModal').addEventListener('click', e => {
+  if(e.target === document.getElementById('cuponModal')) cerrarModal();
+});
+
+/* ── CONFETTI ── */
+function lanzarConfetti(n = 80){
+  const el = document.getElementById('explosion');
+  el.innerHTML = '';
+  el.classList.add('active');
+  const colors = ['#c8607f','#e07898','#f09ab8','#d4ae4a','#eed080','#8a3050','#fff0f5'];
+  for(let i=0; i<n; i++){
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    const w = Math.random()*10+5, h = Math.random()*14+6;
+    p.style.cssText = `
+      left:${Math.random()*100}%;
+      width:${w}px; height:${h}px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      animation-duration:${Math.random()*2+1.5}s;
+      animation-delay:${Math.random()*0.8}s;
+      border-radius:${Math.random()>0.5?'50%':'2px'};
+      opacity:${Math.random()*0.6+0.4};
+    `;
+    el.appendChild(p);
+  }
+  setTimeout(() => { el.classList.remove('active'); el.innerHTML=''; }, 4000);
+}
+
+/* ── REVEAL ── */
+let revealed = false;
+function revelarSorpresa(){
+  if(revealed) return;
+  revealed = true;
+  lanzarConfetti(80);
+  const zone = document.getElementById('surpriseZone');
+  zone.style.transition = 'opacity 0.5s, transform 0.5s';
+  zone.style.opacity = '0';
+  zone.style.transform = 'scale(0.8)';
+  setTimeout(() => {
+    zone.style.display = 'none';
+    const cont = document.getElementById('contenido');
+    cont.classList.add('visible');
+    renderCupones();
+  }, 500);
+}
+</script>
+</body>
+</html>
